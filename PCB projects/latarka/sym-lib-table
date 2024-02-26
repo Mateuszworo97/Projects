@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name latarkalib)(type Legacy)(uri ${KIPRJMOD}/latarkalib.lib)(options "")(descr ""))
+  (lib (name mcp1643)(type Legacy)(uri ${KIPRJMOD}/mcp1643.lib)(options "")(descr ""))
+)
