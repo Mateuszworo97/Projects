@@ -26,6 +26,25 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "stm32f4xx_it.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_gpio_ex.h"
+
+#include "stm32f4xx_hal_exti.h"
+#include "stm32f4xx_hal_uart.h"
+
+#include <stdio.h>
+#include <printf.h>
+
+#include "usart.h"
+#include "gpio.h"
+#include "i2c.h"
+#include "bme280.h"
+#include "SSD1306_OLED.h"
+
+#include "bh1750.h"
+#include "GFX_BW.h"
+#include "fonts/font_8x5.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +64,15 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+typedef struct {
+	float Humidity;
+	float Temperature;
+	int32_t Pressure;
+} BmeData_t;
+typedef struct {
+	float LightIntensity;
 
+} BHData_t;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -138,9 +165,9 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  printf("LED2 TASK \n\r");
-	  tick += (30000 * osKernelGetTickFreq()) / 1000;
+	  tick += (300 * osKernelGetTickFreq()) / 1000;
 	  osDelayUntil(tick);
   }
   /* USER CODE END StartDefaultTask */
@@ -156,10 +183,30 @@ void StartDefaultTask(void *argument)
 void StartTaskTaskRTC(void *argument)
 {
   /* USER CODE BEGIN StartTaskTaskRTC */
+
+	char MessageTemp[32];
+
+	SSD1306_Init(&hi2c1);
+
+	GFX_SetFont(font_8x5);
+
+	SSD1306_Clear(BLACK);
+
+	SSD1306_Display();
+
+	uint32_t tick2 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  SSD1306_Clear(BLACK);
+	  sprintf(MessageTemp, "Temperature: 28 ");
+	  GFX_DrawString(0, 0, MessageTemp, WHITE, 0);
+
+	  SSD1306_Display();
+	  printf("TASK OLED \n\r");
+
+	tick2 += (100 * osKernelGetTickFreq()) / 1000;
+	osDelayUntil(tick2);
   }
   /* USER CODE END StartTaskTaskRTC */
 }
@@ -168,10 +215,10 @@ void StartTaskTaskRTC(void *argument)
 /* USER CODE BEGIN Application */
 void _putchar(char character) {
 	// send char to console etc.
-	osMutexAcquire(MutexUartHandle, osWaitForever);
+	osMutexAcquire(MutexPrintfHandle, osWaitForever);
 	HAL_UART_Transmit(&huart2, (uint8_t*)&character, 1, 1000);
 
-	osMutexRelease(MutexUartHandle);
+	osMutexRelease(MutexPrintfHandle);
 }
 
 /* USER CODE END Application */

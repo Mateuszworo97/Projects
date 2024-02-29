@@ -1,0 +1,13 @@
+../Core/Src/bme280.c:22:9:BME280_Read8	1
+../Core/Src/bme280.c:30:10:BME280_Read16	1
+../Core/Src/bme280.c:38:10:BME280_Read16LE	1
+../Core/Src/bme280.c:46:6:BME280_Write8	1
+../Core/Src/bme280.c:52:10:BME280_Read24	1
+../Core/Src/bme280.c:59:9:BME280_IsReadingCalibration	1
+../Core/Src/bme280.c:66:6:BME280_SetConfig	1
+../Core/Src/bme280.c:72:6:BME280_Init	11
+../Core/Src/bme280.c:141:7:BME280_ReadTemperature	5
+../Core/Src/bme280.c:190:9:BME280_ReadPressure	3
+../Core/Src/bme280.c:220:7:BME280_ReadHuminidity	2
+../Core/Src/bme280.c:247:9:BME280_ReadTemperatureAndPressureAndHuminidity	5
+../Core/Src/bme280.c:305:7:BME280_ReadAltitude	1
