@@ -60,6 +60,8 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+RTC_TimeTypeDef _RTCTime;
+ RTC_DateTypeDef _RTCDate;
 
 /* USER CODE END 0 */
 
@@ -70,7 +72,13 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+		_RTCDate.Date = 0x1;
+	 	_RTCDate.Month = RTC_MONTH_MARCH;
+	 	_RTCDate.Year = 0x24;
 
+	 	_RTCTime.Hours = 0x0;
+	    _RTCTime.Minutes =0x0;
+		_RTCTime.Seconds =0x0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -177,7 +185,7 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_SetPriority(RCC_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(RCC_IRQn);
   /* EXTI9_5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 

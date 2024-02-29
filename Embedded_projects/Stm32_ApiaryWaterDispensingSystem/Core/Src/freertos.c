@@ -39,6 +39,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "i2c.h"
+#include "rtc.h"
 #include "bme280.h"
 #include "SSD1306_OLED.h"
 
@@ -73,6 +74,8 @@ typedef struct {
 	float LightIntensity;
 
 } BHData_t;
+
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -88,10 +91,86 @@ const osThreadAttr_t TaskRTC_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for TaskBme280 */
+osThreadId_t TaskBme280Handle;
+const osThreadAttr_t TaskBme280_attributes = {
+  .name = "TaskBme280",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskBH1750 */
+osThreadId_t TaskBH1750Handle;
+const osThreadAttr_t TaskBH1750_attributes = {
+  .name = "TaskBH1750",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskSSD1306 */
+osThreadId_t TaskSSD1306Handle;
+const osThreadAttr_t TaskSSD1306_attributes = {
+  .name = "TaskSSD1306",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for QueueBme */
+osMessageQueueId_t QueueBmeHandle;
+const osMessageQueueAttr_t QueueBme_attributes = {
+  .name = "QueueBme"
+};
+/* Definitions for QueueBh1750 */
+osMessageQueueId_t QueueBh1750Handle;
+const osMessageQueueAttr_t QueueBh1750_attributes = {
+  .name = "QueueBh1750"
+};
+/* Definitions for QueueRTCData */
+osMessageQueueId_t QueueRTCDataHandle;
+const osMessageQueueAttr_t QueueRTCData_attributes = {
+  .name = "QueueRTCData"
+};
+/* Definitions for QueueRTCTime */
+osMessageQueueId_t QueueRTCTimeHandle;
+const osMessageQueueAttr_t QueueRTCTime_attributes = {
+  .name = "QueueRTCTime"
+};
+/* Definitions for TimerBmeData */
+osTimerId_t TimerBmeDataHandle;
+const osTimerAttr_t TimerBmeData_attributes = {
+  .name = "TimerBmeData"
+};
+/* Definitions for TimerBh1750Data */
+osTimerId_t TimerBh1750DataHandle;
+const osTimerAttr_t TimerBh1750Data_attributes = {
+  .name = "TimerBh1750Data"
+};
+/* Definitions for TimerRTC */
+osTimerId_t TimerRTCHandle;
+const osTimerAttr_t TimerRTC_attributes = {
+  .name = "TimerRTC"
+};
 /* Definitions for MutexPrintf */
 osMutexId_t MutexPrintfHandle;
 const osMutexAttr_t MutexPrintf_attributes = {
   .name = "MutexPrintf"
+};
+/* Definitions for MutexI2C */
+osMutexId_t MutexI2CHandle;
+const osMutexAttr_t MutexI2C_attributes = {
+  .name = "MutexI2C"
+};
+/* Definitions for BinarySemBme280 */
+osSemaphoreId_t BinarySemBme280Handle;
+const osSemaphoreAttr_t BinarySemBme280_attributes = {
+  .name = "BinarySemBme280"
+};
+/* Definitions for BinarySemBH1750 */
+osSemaphoreId_t BinarySemBH1750Handle;
+const osSemaphoreAttr_t BinarySemBH1750_attributes = {
+  .name = "BinarySemBH1750"
+};
+/* Definitions for BinarySemRTC */
+osSemaphoreId_t BinarySemRTCHandle;
+const osSemaphoreAttr_t BinarySemRTC_attributes = {
+  .name = "BinarySemRTC"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,7 +179,13 @@ void _putchar(char character);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-void StartTaskTaskRTC(void *argument);
+void StartTaskRTC(void *argument);
+void StartTaskBme280(void *argument);
+void StartTaskBH1750(void *argument);
+void StartTaskSSD1306(void *argument);
+void CallbackTimerBmeData(void *argument);
+void CallbackTimerBh1750Data(void *argument);
+void CallbackTimerRTC(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -117,17 +202,53 @@ void MX_FREERTOS_Init(void) {
   /* creation of MutexPrintf */
   MutexPrintfHandle = osMutexNew(&MutexPrintf_attributes);
 
+  /* creation of MutexI2C */
+  MutexI2CHandle = osMutexNew(&MutexI2C_attributes);
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
+
+  /* Create the semaphores(s) */
+  /* creation of BinarySemBme280 */
+  BinarySemBme280Handle = osSemaphoreNew(1, 1, &BinarySemBme280_attributes);
+
+  /* creation of BinarySemBH1750 */
+  BinarySemBH1750Handle = osSemaphoreNew(1, 1, &BinarySemBH1750_attributes);
+
+  /* creation of BinarySemRTC */
+  BinarySemRTCHandle = osSemaphoreNew(1, 1, &BinarySemRTC_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of TimerBmeData */
+  TimerBmeDataHandle = osTimerNew(CallbackTimerBmeData, osTimerPeriodic, NULL, &TimerBmeData_attributes);
+
+  /* creation of TimerBh1750Data */
+  TimerBh1750DataHandle = osTimerNew(CallbackTimerBh1750Data, osTimerPeriodic, NULL, &TimerBh1750Data_attributes);
+
+  /* creation of TimerRTC */
+  TimerRTCHandle = osTimerNew(CallbackTimerRTC, osTimerPeriodic, NULL, &TimerRTC_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* creation of QueueBme */
+  QueueBmeHandle = osMessageQueueNew (16, sizeof(BmeData_t), &QueueBme_attributes);
+
+  /* creation of QueueBh1750 */
+  QueueBh1750Handle = osMessageQueueNew (16, sizeof(BHData_t), &QueueBh1750_attributes);
+
+  /* creation of QueueRTCData */
+  QueueRTCDataHandle = osMessageQueueNew (16, sizeof(RTC_DateTypeDef), &QueueRTCData_attributes);
+
+  /* creation of QueueRTCTime */
+  QueueRTCTimeHandle = osMessageQueueNew (16, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -138,7 +259,16 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* creation of TaskRTC */
-  TaskRTCHandle = osThreadNew(StartTaskTaskRTC, NULL, &TaskRTC_attributes);
+  TaskRTCHandle = osThreadNew(StartTaskRTC, NULL, &TaskRTC_attributes);
+
+  /* creation of TaskBme280 */
+  TaskBme280Handle = osThreadNew(StartTaskBme280, NULL, &TaskBme280_attributes);
+
+  /* creation of TaskBH1750 */
+  TaskBH1750Handle = osThreadNew(StartTaskBH1750, NULL, &TaskBH1750_attributes);
+
+  /* creation of TaskSSD1306 */
+  TaskSSD1306Handle = osThreadNew(StartTaskSSD1306, NULL, &TaskSSD1306_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -173,42 +303,229 @@ void StartDefaultTask(void *argument)
   /* USER CODE END StartDefaultTask */
 }
 
-/* USER CODE BEGIN Header_StartTaskTaskRTC */
+/* USER CODE BEGIN Header_StartTaskRTC */
 /**
 * @brief Function implementing the TaskRTC thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTaskTaskRTC */
-void StartTaskTaskRTC(void *argument)
+/* USER CODE END Header_StartTaskRTC */
+void StartTaskRTC(void *argument)
 {
-  /* USER CODE BEGIN StartTaskTaskRTC */
+  /* USER CODE BEGIN StartTaskRTC */
+//	RTC_TimeTypeDef _RTCTime;
+// 	RTC_DateTypeDef _RTCDate;
+// 	extern RTC_HandleTypeDef hrtc;
+ 	 RTC_TimeTypeDef _RTCTime;
+ 	 RTC_DateTypeDef _RTCDate;
 
-	char MessageTemp[32];
+ 	uint8_t CompareSeconds;
+ 	_RTCDate.Date = 0x1;
+ 	_RTCDate.Month = RTC_MONTH_MARCH;
+ 	_RTCDate.Year = 0x24;
 
+ 	_RTCTime.Hours = 0x0;
+    _RTCTime.Minutes =0x0;
+	_RTCTime.Seconds =0x0;
+ 	HAL_RTC_SetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+ 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+ 	osTimerStart(TimerRTCHandle, 100);
+ 	uint32_t tick4 = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+//	  if(RTCTime.Seconds != CompareSeconds)
+//	  {
+//
+//
+//		  CompareSeconds = RTCTime.Seconds;
+//	  }
+	  if (osOK == osSemaphoreAcquire(BinarySemRTCHandle, 0)) {
+	  	  			osMessageQueuePut(QueueRTCDataHandle, &_RTCDate, 0, osWaitForever);
+	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
+	  	  		}
+	  tick4 += ((200 * osKernelGetTickFreq()) / 1000);
+	  osDelayUntil(tick4);
+  }
+  /* USER CODE END StartTaskRTC */
+}
+
+/* USER CODE BEGIN Header_StartTaskBme280 */
+/**
+* @brief Function implementing the TaskBme280 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskBme280 */
+void StartTaskBme280(void *argument)
+{
+  /* USER CODE BEGIN StartTaskBme280 */
+	BmeData_t _BmeData;
+	uint32_t tick3;
+	osMutexAcquire(MutexI2CHandle, osWaitForever);
+	BME280_Init(&hi2c1, BME280_TEMPERATURE_16BIT, BME280_PRESSURE_ULTRALOWPOWER,
+	BME280_HUMINIDITY_STANDARD, BME280_NORMALMODE);
+	BME280_SetConfig(BME280_STANDBY_MS_10, BME280_FILTER_OFF);
+	osMutexRelease(MutexI2CHandle);
+	osTimerStart(TimerBmeDataHandle, 100);
+
+	tick3 = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+	  osMutexAcquire(MutexI2CHandle, osWaitForever);
+	  BME280_ReadTemperatureAndPressureAndHuminidity(&_BmeData.Temperature,
+	  				&_BmeData.Pressure, &_BmeData.Humidity);
+	  osMutexRelease(MutexI2CHandle);
+
+	  if (osOK == osSemaphoreAcquire(BinarySemBme280Handle, 0)) {
+	  			osMessageQueuePut(QueueBmeHandle, &_BmeData, 0, osWaitForever);
+	  		}
+		printf("TASK BME280 \n\r ");
+//	  printf("Temperature: %.2f, Humidity: %.2f z \n\r", _BmeData.Temperature, _BmeData.Humidity);
+//////    osDelay(100);
+		tick3 += (90 * osKernelGetTickFreq()) / 1000;
+		osDelayUntil(tick3);
+  }
+  /* USER CODE END StartTaskBme280 */
+}
+
+/* USER CODE BEGIN Header_StartTaskBH1750 */
+/**
+* @brief Function implementing the TaskBH1750 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskBH1750 */
+void StartTaskBH1750(void *argument)
+{
+  /* USER CODE BEGIN StartTaskBH1750 */
+
+	uint32_t tick4;
+	BHData_t _BHData;
+
+	//	float BH1750_lux;
+
+	osMutexAcquire(MutexI2CHandle, osWaitForever);
+	BH1750_Init(&hi2c1);
+	BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
+	osMutexRelease(MutexI2CHandle);
+
+	osTimerStart(TimerBh1750DataHandle, 100);
+	tick4 = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+	  	  osMutexAcquire(MutexI2CHandle, osWaitForever);
+
+	  		BH1750_ReadLight(&_BHData.LightIntensity);
+	  //	  	  printf("Light: %.2f \n\r", _BhData.LightIntensity);
+	  		osMutexRelease(MutexI2CHandle);
+
+	  		if (osOK == osSemaphoreAcquire(BinarySemBH1750Handle, 0)) {
+	  			osMessageQueuePut(QueueBh1750Handle, &_BHData, 0, osWaitForever);
+	  		}
+	  //	  	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux))
+	  //	  	 	  	  {
+	  //	  	 	  		  size = sprintf(buffer, "BH1750 Lux: %.2f\n\r", BH1750_lux);
+	  //	  	 	  	  	  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, size, 100);
+	  //	  	 	  	  }
+	  		printf("TASK BH1750 \n\r ");
+	  		tick4 += ((80 * osKernelGetTickFreq()) / 1000);
+	  		osDelayUntil(tick4);
+
+  }
+  /* USER CODE END StartTaskBH1750 */
+}
+
+/* USER CODE BEGIN Header_StartTaskSSD1306 */
+/**
+* @brief Function implementing the TaskSSD1306 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskSSD1306 */
+void StartTaskSSD1306(void *argument)
+{
+  /* USER CODE BEGIN StartTaskSSD1306 */
+
+	char MessageTemp[32], MessageHum[32];
+	char MessageInten[32];
+	char MessageData[32];
+
+	BmeData_t _BmeData;
+	BHData_t _BHData;
+	RTC_TimeTypeDef _RTCTime;
+ 	RTC_DateTypeDef _RTCDate;
+
+	uint32_t tick2;
+
+	osMutexAcquire(MutexI2CHandle, osWaitForever);
 	SSD1306_Init(&hi2c1);
+	osMutexRelease(MutexI2CHandle);
 
 	GFX_SetFont(font_8x5);
-
 	SSD1306_Clear(BLACK);
-
 	SSD1306_Display();
 
-	uint32_t tick2 = osKernelGetTickCount();
+	tick2 = osKernelGetTickCount();
+
   /* Infinite loop */
   for(;;)
   {
 	  SSD1306_Clear(BLACK);
-	  sprintf(MessageTemp, "Temperature: 28 ");
-	  GFX_DrawString(0, 0, MessageTemp, WHITE, 0);
+	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, osWaitForever);
+
+	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, osWaitForever);
+	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,100);
+	  osMessageQueueGet(QueueRTCDataHandle, &_RTCTime, 0,100);
+
+
+	  sprintf(MessageTemp, "Temperature: %.2f ", _BmeData.Temperature);
+	  sprintf(MessageHum, "Humidity: %.2f", _BmeData.Humidity);
+	  sprintf(MessageInten, "Lx: %.2f,", _BHData.LightIntensity);
+//	  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+	  sprintf(MessageData, " Time: %02d:%02d:%02d",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+	  GFX_DrawString(0, 0, MessageData, WHITE, 0);
+	  GFX_DrawString(0, 10, MessageTemp, WHITE, 0);
+	  GFX_DrawString(0, 20, MessageHum, WHITE, 0);
+	  GFX_DrawString(0, 30, MessageInten, WHITE, 0);
 
 	  SSD1306_Display();
 	  printf("TASK OLED \n\r");
 
-	tick2 += (100 * osKernelGetTickFreq()) / 1000;
-	osDelayUntil(tick2);
+//		printf("TASK OLED I2C MUTEX is released \n\r");
+      tick2 += (100 * osKernelGetTickFreq()) / 1000;
+	  osDelayUntil(tick2);
   }
-  /* USER CODE END StartTaskTaskRTC */
+  /* USER CODE END StartTaskSSD1306 */
+}
+
+/* CallbackTimerBmeData function */
+void CallbackTimerBmeData(void *argument)
+{
+  /* USER CODE BEGIN CallbackTimerBmeData */
+	osSemaphoreRelease(BinarySemBme280Handle);
+
+  /* USER CODE END CallbackTimerBmeData */
+}
+
+/* CallbackTimerBh1750Data function */
+void CallbackTimerBh1750Data(void *argument)
+{
+  /* USER CODE BEGIN CallbackTimerBh1750Data */
+	osSemaphoreRelease(BinarySemBH1750Handle);
+  /* USER CODE END CallbackTimerBh1750Data */
+}
+
+/* CallbackTimerRTC function */
+void CallbackTimerRTC(void *argument)
+{
+  /* USER CODE BEGIN CallbackTimerRTC */
+	osSemaphoreRelease(BinarySemRTCHandle);
+  /* USER CODE END CallbackTimerRTC */
 }
 
 /* Private application code --------------------------------------------------*/

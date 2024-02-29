@@ -1,6 +1,6 @@
 /*
  * bh1750.c
- *
+ * The MIT License.
  *  Created on: Apr 23, 2023
  *      Author: Y700
  */
