@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 #include "i2c.h"
 #include "rtc.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -60,8 +61,8 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-RTC_TimeTypeDef _RTCTime;
- RTC_DateTypeDef _RTCDate;
+//RTC_TimeTypeDef _RTCTime;
+// RTC_DateTypeDef _RTCDate;
 
 /* USER CODE END 0 */
 
@@ -72,13 +73,13 @@ RTC_TimeTypeDef _RTCTime;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-		_RTCDate.Date = 0x1;
-	 	_RTCDate.Month = RTC_MONTH_MARCH;
-	 	_RTCDate.Year = 0x24;
-
-	 	_RTCTime.Hours = 0x0;
-	    _RTCTime.Minutes =0x0;
-		_RTCTime.Seconds =0x0;
+//		_RTCDate.Date = 0x1;
+//	 	_RTCDate.Month = RTC_MONTH_MARCH;
+//	 	_RTCDate.Year = 0x24;
+//
+//	 	_RTCTime.Hours = 0x0;
+//	    _RTCTime.Minutes =0x0;
+//		_RTCTime.Seconds =0x0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,6 +103,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   MX_RTC_Init();
+  MX_TIM3_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -150,9 +152,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 74;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -184,9 +186,6 @@ static void MX_NVIC_Init(void)
   /* RCC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(RCC_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(RCC_IRQn);
-  /* EXTI9_5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
@@ -195,7 +194,7 @@ static void MX_NVIC_Init(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM14 interrupt took place, inside
+  * @note   This function is called  when TIM10 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -206,7 +205,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM14) {
+  if (htim->Instance == TIM10) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */

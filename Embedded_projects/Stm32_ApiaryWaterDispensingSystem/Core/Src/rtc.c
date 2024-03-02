@@ -59,27 +59,27 @@ void MX_RTC_Init(void)
 //  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 //  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
-  return;
+//  return;
 
   /* USER CODE END Check_RTC_BKUP */
 
   /** Initialize RTC and set the Time and Date
   */
-  sTime.Hours = 0;
-  sTime.Minutes = 0;
-  sTime.Seconds = 0;
+  sTime.Hours = 0x20;
+  sTime.Minutes = 0x15;
+  sTime.Seconds = 0x30;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
   {
     Error_Handler();
   }
   sDate.WeekDay = RTC_WEEKDAY_FRIDAY;
   sDate.Month = RTC_MONTH_MARCH;
-  sDate.Date = 1;
-  sDate.Year = 24;
+  sDate.Date = 0x1;
+  sDate.Year = 0x24;
 
-  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
   {
     Error_Handler();
   }

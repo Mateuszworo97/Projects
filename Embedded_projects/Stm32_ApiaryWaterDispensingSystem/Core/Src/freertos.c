@@ -29,6 +29,8 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio_ex.h"
+#include "stm32f4xx_hal_rtc.h"
+#include "stm32f4xx_hal_i2c.h"
 
 #include "stm32f4xx_hal_exti.h"
 #include "stm32f4xx_hal_uart.h"
@@ -88,7 +90,7 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t TaskRTCHandle;
 const osThreadAttr_t TaskRTC_attributes = {
   .name = "TaskRTC",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskBme280 */
@@ -109,7 +111,7 @@ const osThreadAttr_t TaskBH1750_attributes = {
 osThreadId_t TaskSSD1306Handle;
 const osThreadAttr_t TaskSSD1306_attributes = {
   .name = "TaskSSD1306",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for QueueBme */
@@ -156,6 +158,11 @@ const osMutexAttr_t MutexPrintf_attributes = {
 osMutexId_t MutexI2CHandle;
 const osMutexAttr_t MutexI2C_attributes = {
   .name = "MutexI2C"
+};
+/* Definitions for MutexRTC */
+osMutexId_t MutexRTCHandle;
+const osMutexAttr_t MutexRTC_attributes = {
+  .name = "MutexRTC"
 };
 /* Definitions for BinarySemBme280 */
 osSemaphoreId_t BinarySemBme280Handle;
@@ -204,6 +211,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of MutexI2C */
   MutexI2CHandle = osMutexNew(&MutexI2C_attributes);
+
+  /* creation of MutexRTC */
+  MutexRTCHandle = osMutexNew(&MutexRTC_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -315,27 +325,31 @@ void StartTaskRTC(void *argument)
   /* USER CODE BEGIN StartTaskRTC */
 //	RTC_TimeTypeDef _RTCTime;
 // 	RTC_DateTypeDef _RTCDate;
-// 	extern RTC_HandleTypeDef hrtc;
+ 	extern RTC_HandleTypeDef hrtc;
  	 RTC_TimeTypeDef _RTCTime;
  	 RTC_DateTypeDef _RTCDate;
 
  	uint8_t CompareSeconds;
- 	_RTCDate.Date = 0x1;
- 	_RTCDate.Month = RTC_MONTH_MARCH;
- 	_RTCDate.Year = 0x24;
-
- 	_RTCTime.Hours = 0x0;
-    _RTCTime.Minutes =0x0;
-	_RTCTime.Seconds =0x0;
- 	HAL_RTC_SetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
- 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+// 	_RTCDate.Date = 0x1;
+// 	_RTCDate.Month = RTC_MONTH_MARCH;
+// 	_RTCDate.Year = 0x24;
+ 	HAL_RTC_Init(&hrtc);
+	HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BCD);
+	HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BCD);
+// 	_RTCTime.Hours = 0x0;
+//    _RTCTime.Minutes =0x0;
+//	_RTCTime.Seconds =0x0;
+// 	HAL_RTC_SetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+// 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
  	osTimerStart(TimerRTCHandle, 100);
  	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+
 	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+
 //	  if(RTCTime.Seconds != CompareSeconds)
 //	  {
 //
@@ -343,10 +357,10 @@ void StartTaskRTC(void *argument)
 //		  CompareSeconds = RTCTime.Seconds;
 //	  }
 	  if (osOK == osSemaphoreAcquire(BinarySemRTCHandle, 0)) {
-	  	  			osMessageQueuePut(QueueRTCDataHandle, &_RTCDate, 0, osWaitForever);
+//	  	  			osMessageQueuePut(QueueRTCDataHandle, &_RTCDate, 0, osWaitForever);
 	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 	  	  		}
-	  tick4 += ((200 * osKernelGetTickFreq()) / 1000);
+	  tick4 += ((40 * osKernelGetTickFreq()) / 1000);
 	  osDelayUntil(tick4);
   }
   /* USER CODE END StartTaskRTC */
@@ -459,7 +473,6 @@ void StartTaskSSD1306(void *argument)
 	BHData_t _BHData;
 	RTC_TimeTypeDef _RTCTime;
  	RTC_DateTypeDef _RTCDate;
-
 	uint32_t tick2;
 
 	osMutexAcquire(MutexI2CHandle, osWaitForever);
@@ -479,8 +492,8 @@ void StartTaskSSD1306(void *argument)
 	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, osWaitForever);
 
 	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, osWaitForever);
-	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,100);
-	  osMessageQueueGet(QueueRTCDataHandle, &_RTCTime, 0,100);
+//	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
+	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0,100);
 
 
 	  sprintf(MessageTemp, "Temperature: %.2f ", _BmeData.Temperature);
