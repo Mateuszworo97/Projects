@@ -78,6 +78,8 @@ typedef struct {
 } BHData_t;
 
 
+
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -112,6 +114,13 @@ osThreadId_t TaskSSD1306Handle;
 const osThreadAttr_t TaskSSD1306_attributes = {
   .name = "TaskSSD1306",
   .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskPump */
+osThreadId_t TaskPumpHandle;
+const osThreadAttr_t TaskPump_attributes = {
+  .name = "TaskPump",
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for QueueBme */
@@ -190,6 +199,7 @@ void StartTaskRTC(void *argument);
 void StartTaskBme280(void *argument);
 void StartTaskBH1750(void *argument);
 void StartTaskSSD1306(void *argument);
+void StartTaskPump(void *argument);
 void CallbackTimerBmeData(void *argument);
 void CallbackTimerBh1750Data(void *argument);
 void CallbackTimerRTC(void *argument);
@@ -280,6 +290,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of TaskSSD1306 */
   TaskSSD1306Handle = osThreadNew(StartTaskSSD1306, NULL, &TaskSSD1306_attributes);
 
+  /* creation of TaskPump */
+  TaskPumpHandle = osThreadNew(StartTaskPump, NULL, &TaskPump_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -305,7 +318,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+//	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  printf("LED2 TASK \n\r");
 	  tick += (300 * osKernelGetTickFreq()) / 1000;
 	  osDelayUntil(tick);
@@ -336,6 +349,8 @@ void StartTaskRTC(void *argument)
  	HAL_RTC_Init(&hrtc);
 	HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BCD);
 	HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BCD);
+
+	HAL_RTC_SetAlarm(&hrtc, &Alarm1, RTC_FORMAT_BIN);
 // 	_RTCTime.Hours = 0x0;
 //    _RTCTime.Minutes =0x0;
 //	_RTCTime.Seconds =0x0;
@@ -350,6 +365,12 @@ void StartTaskRTC(void *argument)
 	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
+
+	  if (Alarm1.AlarmTime.Hours ==  _RTCTime.Hours && Alarm1.AlarmTime.Minutes ==  _RTCTime.Minutes )
+	  {
+		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
+		  Alarm1.AlarmTime.Hours = 12;
+	  }
 //	  if(RTCTime.Seconds != CompareSeconds)
 //	  {
 //
@@ -360,6 +381,7 @@ void StartTaskRTC(void *argument)
 //	  	  			osMessageQueuePut(QueueRTCDataHandle, &_RTCDate, 0, osWaitForever);
 	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 	  	  		}
+
 	  tick4 += ((40 * osKernelGetTickFreq()) / 1000);
 	  osDelayUntil(tick4);
   }
@@ -490,7 +512,6 @@ void StartTaskSSD1306(void *argument)
   {
 	  SSD1306_Clear(BLACK);
 	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, osWaitForever);
-
 	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, osWaitForever);
 //	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
 	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0,100);
@@ -514,6 +535,24 @@ void StartTaskSSD1306(void *argument)
 	  osDelayUntil(tick2);
   }
   /* USER CODE END StartTaskSSD1306 */
+}
+
+/* USER CODE BEGIN Header_StartTaskPump */
+/**
+* @brief Function implementing the TaskPump thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskPump */
+void StartTaskPump(void *argument)
+{
+  /* USER CODE BEGIN StartTaskPump */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartTaskPump */
 }
 
 /* CallbackTimerBmeData function */
@@ -543,6 +582,11 @@ void CallbackTimerRTC(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+
+}
 void _putchar(char character) {
 	// send char to console etc.
 	osMutexAcquire(MutexPrintfHandle, osWaitForever);
