@@ -43,6 +43,7 @@
 #include "i2c.h"
 #include "rtc.h"
 #include "bme280.h"
+#include "tim.h"
 #include "SSD1306_OLED.h"
 
 #include "bh1750.h"
@@ -341,8 +342,12 @@ void StartTaskRTC(void *argument)
  	extern RTC_HandleTypeDef hrtc;
  	 RTC_TimeTypeDef _RTCTime;
  	 RTC_DateTypeDef _RTCDate;
+ 	 RTC_AlarmTypeDef _Alarm1;
+ 	 uint8_t CompareSeconds;
 
- 	uint8_t CompareSeconds;
+ 	 _Alarm1.AlarmTime.Hours = 8 ;
+ 	 _Alarm1.AlarmTime.Minutes = 0 ;
+ 	_Alarm1.AlarmTime.Seconds = 0 ;
 // 	_RTCDate.Date = 0x1;
 // 	_RTCDate.Month = RTC_MONTH_MARCH;
 // 	_RTCDate.Year = 0x24;
@@ -350,7 +355,8 @@ void StartTaskRTC(void *argument)
 	HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BCD);
 	HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BCD);
 
-	HAL_RTC_SetAlarm(&hrtc, &Alarm1, RTC_FORMAT_BIN);
+	HAL_RTC_SetAlarm(&hrtc, &_Alarm1, RTC_FORMAT_BIN);
+	drv8835_init();
 // 	_RTCTime.Hours = 0x0;
 //    _RTCTime.Minutes =0x0;
 //	_RTCTime.Seconds =0x0;
@@ -366,10 +372,15 @@ void StartTaskRTC(void *argument)
 	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
 
-	  if (Alarm1.AlarmTime.Hours ==  _RTCTime.Hours && Alarm1.AlarmTime.Minutes ==  _RTCTime.Minutes )
+	  if (_Alarm1.AlarmTime.Hours ==  _RTCTime.Hours && _Alarm1.AlarmTime.Minutes ==  _RTCTime.Minutes )
 	  {
 		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
-		  Alarm1.AlarmTime.Hours = 12;
+		  drv8835_set_motorA_speed(100);
+		  _Alarm1.AlarmTime.Hours = _Alarm1.AlarmTime.Hours + 4;
+		  if(_Alarm1.AlarmTime.Hours == 24)
+		  {
+			  _Alarm1.AlarmTime.Hours = 8;
+		  }
 	  }
 //	  if(RTCTime.Seconds != CompareSeconds)
 //	  {
@@ -382,7 +393,7 @@ void StartTaskRTC(void *argument)
 	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 	  	  		}
 
-	  tick4 += ((40 * osKernelGetTickFreq()) / 1000);
+	  tick4 += ((60 * osKernelGetTickFreq()) / 1000);
 	  osDelayUntil(tick4);
   }
   /* USER CODE END StartTaskRTC */
@@ -489,7 +500,8 @@ void StartTaskSSD1306(void *argument)
 
 	char MessageTemp[32], MessageHum[32];
 	char MessageInten[32];
-	char MessageData[32];
+	char MessageTime[32];
+	char Message
 
 	BmeData_t _BmeData;
 	BHData_t _BHData;
@@ -521,8 +533,8 @@ void StartTaskSSD1306(void *argument)
 	  sprintf(MessageHum, "Humidity: %.2f", _BmeData.Humidity);
 	  sprintf(MessageInten, "Lx: %.2f,", _BHData.LightIntensity);
 //	  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
-	  sprintf(MessageData, " Time: %02d:%02d:%02d",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
-	  GFX_DrawString(0, 0, MessageData, WHITE, 0);
+	  sprintf(MessageTime, " Time: %02d:%02d:%02d",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+	  GFX_DrawString(0, 0, MessageTime, WHITE, 0);
 	  GFX_DrawString(0, 10, MessageTemp, WHITE, 0);
 	  GFX_DrawString(0, 20, MessageHum, WHITE, 0);
 	  GFX_DrawString(0, 30, MessageInten, WHITE, 0);
@@ -550,7 +562,8 @@ void StartTaskPump(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
+    osDelay(1000);
   }
   /* USER CODE END StartTaskPump */
 }
@@ -585,7 +598,20 @@ void CallbackTimerRTC(void *argument)
 
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-
+//
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == B1_Pin)
+	{
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		drv8835_set_motorA_speed(100);
+	}
+	else if(GPIO_Pin == B2_Pin)
+	{
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		drv8835_set_motorA_speed(0);
+	}
 }
 void _putchar(char character) {
 	// send char to console etc.

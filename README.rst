@@ -1,4 +1,4 @@
-# Projects
+
 
 About
 ====
@@ -24,7 +24,8 @@ Refer to `docs/components.rst`.
 
 Hardware
 ====
-Contains documentation of the sensors and components used
+Contains documentation of the sensors and components used.
+-Diagram of the electronic system of the device.
 
 Refer to `docs/hardware`.
 
