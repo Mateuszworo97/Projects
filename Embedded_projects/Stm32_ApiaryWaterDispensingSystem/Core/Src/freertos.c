@@ -25,10 +25,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "semphr.h"
 
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio_ex.h"
+#include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_rtc.h"
 #include "stm32f4xx_hal_i2c.h"
 
@@ -45,6 +47,7 @@
 #include "bme280.h"
 #include "tim.h"
 #include "SSD1306_OLED.h"
+#include "drv8835.h"
 
 #include "bh1750.h"
 #include "GFX_BW.h"
@@ -82,10 +85,10 @@ typedef struct {
 
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for TaskLed */
+osThreadId_t TaskLedHandle;
+const osThreadAttr_t TaskLed_attributes = {
+  .name = "TaskLed",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -93,34 +96,69 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t TaskRTCHandle;
 const osThreadAttr_t TaskRTC_attributes = {
   .name = "TaskRTC",
-  .stack_size = 512 * 4,
+  .stack_size = 2048 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskBme280 */
 osThreadId_t TaskBme280Handle;
 const osThreadAttr_t TaskBme280_attributes = {
   .name = "TaskBme280",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskBH1750 */
 osThreadId_t TaskBH1750Handle;
 const osThreadAttr_t TaskBH1750_attributes = {
   .name = "TaskBH1750",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskSSD1306 */
 osThreadId_t TaskSSD1306Handle;
 const osThreadAttr_t TaskSSD1306_attributes = {
   .name = "TaskSSD1306",
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskPumpON */
+osThreadId_t TaskPumpONHandle;
+const osThreadAttr_t TaskPumpON_attributes = {
+  .name = "TaskPumpON",
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for TaskPump */
-osThreadId_t TaskPumpHandle;
-const osThreadAttr_t TaskPump_attributes = {
-  .name = "TaskPump",
+/* Definitions for TaskPumpOFF */
+osThreadId_t TaskPumpOFFHandle;
+const osThreadAttr_t TaskPumpOFF_attributes = {
+  .name = "TaskPumpOFF",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskCounterUp */
+osThreadId_t TaskCounterUpHandle;
+const osThreadAttr_t TaskCounterUp_attributes = {
+  .name = "TaskCounterUp",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskCounterDown */
+osThreadId_t TaskCounterDownHandle;
+const osThreadAttr_t TaskCounterDown_attributes = {
+  .name = "TaskCounterDown",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskAlarmCountU */
+osThreadId_t TaskAlarmCountUHandle;
+const osThreadAttr_t TaskAlarmCountU_attributes = {
+  .name = "TaskAlarmCountU",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskAlarmCountD */
+osThreadId_t TaskAlarmCountDHandle;
+const osThreadAttr_t TaskAlarmCountD_attributes = {
+  .name = "TaskAlarmCountD",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -143,6 +181,16 @@ const osMessageQueueAttr_t QueueRTCData_attributes = {
 osMessageQueueId_t QueueRTCTimeHandle;
 const osMessageQueueAttr_t QueueRTCTime_attributes = {
   .name = "QueueRTCTime"
+};
+/* Definitions for QueueCounterPump */
+osMessageQueueId_t QueueCounterPumpHandle;
+const osMessageQueueAttr_t QueueCounterPump_attributes = {
+  .name = "QueueCounterPump"
+};
+/* Definitions for QueueAlarm */
+osMessageQueueId_t QueueAlarmHandle;
+const osMessageQueueAttr_t QueueAlarm_attributes = {
+  .name = "QueueAlarm"
 };
 /* Definitions for TimerBmeData */
 osTimerId_t TimerBmeDataHandle;
@@ -174,6 +222,16 @@ osMutexId_t MutexRTCHandle;
 const osMutexAttr_t MutexRTC_attributes = {
   .name = "MutexRTC"
 };
+/* Definitions for MutexAlarm */
+osMutexId_t MutexAlarmHandle;
+const osMutexAttr_t MutexAlarm_attributes = {
+  .name = "MutexAlarm"
+};
+/* Definitions for MutexI2C2 */
+osMutexId_t MutexI2C2Handle;
+const osMutexAttr_t MutexI2C2_attributes = {
+  .name = "MutexI2C2"
+};
 /* Definitions for BinarySemBme280 */
 osSemaphoreId_t BinarySemBme280Handle;
 const osSemaphoreAttr_t BinarySemBme280_attributes = {
@@ -189,18 +247,38 @@ osSemaphoreId_t BinarySemRTCHandle;
 const osSemaphoreAttr_t BinarySemRTC_attributes = {
   .name = "BinarySemRTC"
 };
+/* Definitions for BinarySemCountUp */
+osSemaphoreId_t BinarySemCountUpHandle;
+const osSemaphoreAttr_t BinarySemCountUp_attributes = {
+  .name = "BinarySemCountUp"
+};
+/* Definitions for BinarySemCountDown */
+osSemaphoreId_t BinarySemCountDownHandle;
+const osSemaphoreAttr_t BinarySemCountDown_attributes = {
+  .name = "BinarySemCountDown"
+};
+/* Definitions for BinarySemSetAlarm */
+osSemaphoreId_t BinarySemSetAlarmHandle;
+const osSemaphoreAttr_t BinarySemSetAlarm_attributes = {
+  .name = "BinarySemSetAlarm"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 void _putchar(char character);
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartTaskL(void *argument);
 void StartTaskRTC(void *argument);
 void StartTaskBme280(void *argument);
 void StartTaskBH1750(void *argument);
 void StartTaskSSD1306(void *argument);
-void StartTaskPump(void *argument);
+void StartTaskPumpON(void *argument);
+void StartTaskPumpOFF(void *argument);
+void StartTaskCounterPumpUp(void *argument);
+void StartTaskCounterDown(void *argument);
+void StartTaskAlarmCounterUp(void *argument);
+void StartTaskAlarmCountDown(void *argument);
 void CallbackTimerBmeData(void *argument);
 void CallbackTimerBh1750Data(void *argument);
 void CallbackTimerRTC(void *argument);
@@ -226,6 +304,12 @@ void MX_FREERTOS_Init(void) {
   /* creation of MutexRTC */
   MutexRTCHandle = osMutexNew(&MutexRTC_attributes);
 
+  /* creation of MutexAlarm */
+  MutexAlarmHandle = osMutexNew(&MutexAlarm_attributes);
+
+  /* creation of MutexI2C2 */
+  MutexI2C2Handle = osMutexNew(&MutexI2C2_attributes);
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
@@ -239,6 +323,15 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of BinarySemRTC */
   BinarySemRTCHandle = osSemaphoreNew(1, 1, &BinarySemRTC_attributes);
+
+  /* creation of BinarySemCountUp */
+  BinarySemCountUpHandle = osSemaphoreNew(1, 1, &BinarySemCountUp_attributes);
+
+  /* creation of BinarySemCountDown */
+  BinarySemCountDownHandle = osSemaphoreNew(1, 1, &BinarySemCountDown_attributes);
+
+  /* creation of BinarySemSetAlarm */
+  BinarySemSetAlarmHandle = osSemaphoreNew(1, 1, &BinarySemSetAlarm_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -271,13 +364,19 @@ void MX_FREERTOS_Init(void) {
   /* creation of QueueRTCTime */
   QueueRTCTimeHandle = osMessageQueueNew (16, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
 
+  /* creation of QueueCounterPump */
+  QueueCounterPumpHandle = osMessageQueueNew (16, sizeof(RTC_TimeTypeDef), &QueueCounterPump_attributes);
+
+  /* creation of QueueAlarm */
+  QueueAlarmHandle = osMessageQueueNew (16, sizeof(RTC_TimeTypeDef), &QueueAlarm_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of TaskLed */
+  TaskLedHandle = osThreadNew(StartTaskL, NULL, &TaskLed_attributes);
 
   /* creation of TaskRTC */
   TaskRTCHandle = osThreadNew(StartTaskRTC, NULL, &TaskRTC_attributes);
@@ -291,8 +390,23 @@ void MX_FREERTOS_Init(void) {
   /* creation of TaskSSD1306 */
   TaskSSD1306Handle = osThreadNew(StartTaskSSD1306, NULL, &TaskSSD1306_attributes);
 
-  /* creation of TaskPump */
-  TaskPumpHandle = osThreadNew(StartTaskPump, NULL, &TaskPump_attributes);
+  /* creation of TaskPumpON */
+  TaskPumpONHandle = osThreadNew(StartTaskPumpON, NULL, &TaskPumpON_attributes);
+
+  /* creation of TaskPumpOFF */
+  TaskPumpOFFHandle = osThreadNew(StartTaskPumpOFF, NULL, &TaskPumpOFF_attributes);
+
+  /* creation of TaskCounterUp */
+  TaskCounterUpHandle = osThreadNew(StartTaskCounterPumpUp, NULL, &TaskCounterUp_attributes);
+
+  /* creation of TaskCounterDown */
+  TaskCounterDownHandle = osThreadNew(StartTaskCounterDown, NULL, &TaskCounterDown_attributes);
+
+  /* creation of TaskAlarmCountU */
+  TaskAlarmCountUHandle = osThreadNew(StartTaskAlarmCounterUp, NULL, &TaskAlarmCountU_attributes);
+
+  /* creation of TaskAlarmCountD */
+  TaskAlarmCountDHandle = osThreadNew(StartTaskAlarmCountDown, NULL, &TaskAlarmCountD_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -304,27 +418,24 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartTaskL */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the TaskLed thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartTaskL */
+void StartTaskL(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
-	uint32_t tick;
-	tick = osKernelGetTickCount();
+  /* USER CODE BEGIN StartTaskL */
+	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
-//	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	  printf("LED2 TASK \n\r");
-	  tick += (300 * osKernelGetTickFreq()) / 1000;
-	  osDelayUntil(tick);
+	  tick4 += ((10000 * osKernelGetTickFreq()) / 1000);
+	  osDelayUntil(tick4);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END StartTaskL */
 }
 
 /* USER CODE BEGIN Header_StartTaskRTC */
@@ -340,48 +451,96 @@ void StartTaskRTC(void *argument)
 //	RTC_TimeTypeDef _RTCTime;
 // 	RTC_DateTypeDef _RTCDate;
  	extern RTC_HandleTypeDef hrtc;
- 	 RTC_TimeTypeDef _RTCTime;
+ 	 RTC_TimeTypeDef _RTCTime, _AlarmPeriod;
  	 RTC_DateTypeDef _RTCDate;
- 	 RTC_AlarmTypeDef _Alarm1;
- 	 uint8_t CompareSeconds;
+ 	 RTC_AlarmTypeDef _AlarmON, _AlarmOFF;
 
- 	 _Alarm1.AlarmTime.Hours = 8 ;
- 	 _Alarm1.AlarmTime.Minutes = 0 ;
- 	_Alarm1.AlarmTime.Seconds = 0 ;
-// 	_RTCDate.Date = 0x1;
-// 	_RTCDate.Month = RTC_MONTH_MARCH;
-// 	_RTCDate.Year = 0x24;
+
+ 	RTC_TimeTypeDef _PumpOperatingTime;
+
+
+
+
+
+
+
+ 	 _AlarmON.AlarmTime.Hours = 8 ;
+ 	 _AlarmON.AlarmTime.Minutes = 0 ;
+ 	_AlarmON.AlarmTime.Seconds = 0 ;
+
+
+	 _AlarmOFF.AlarmTime.Hours = 8 ;
+	 _AlarmOFF.AlarmTime.Minutes = 1 ;
+	_AlarmOFF.AlarmTime.Seconds = 0 ;
+
+
+
+
  	HAL_RTC_Init(&hrtc);
-	HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BCD);
-	HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BCD);
+	HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+	HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
-	HAL_RTC_SetAlarm(&hrtc, &_Alarm1, RTC_FORMAT_BIN);
-	drv8835_init();
+	HAL_RTC_SetAlarm(&hrtc, &_AlarmON, RTC_FORMAT_BIN);
+	HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+
 // 	_RTCTime.Hours = 0x0;
 //    _RTCTime.Minutes =0x0;
 //	_RTCTime.Seconds =0x0;
 // 	HAL_RTC_SetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 // 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
- 	osTimerStart(TimerRTCHandle, 100);
+
+
+ 	osTimerStart(TimerRTCHandle, 200);
  	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+//	  osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 10);
+//	  osMessageQueuePut(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
 
 	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
+//	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
+	  if(osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
+		{
 
-	  if (_Alarm1.AlarmTime.Hours ==  _RTCTime.Hours && _Alarm1.AlarmTime.Minutes ==  _RTCTime.Minutes )
-	  {
-		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
-		  drv8835_set_motorA_speed(100);
-		  _Alarm1.AlarmTime.Hours = _Alarm1.AlarmTime.Hours + 4;
-		  if(_Alarm1.AlarmTime.Hours == 24)
-		  {
-			  _Alarm1.AlarmTime.Hours = 8;
-		  }
-	  }
+		  	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 100);
+		  	  osMessageQueueGet(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
+			  _AlarmOFF.AlarmTime.Minutes = _PumpOperatingTime.Minutes;
+			  HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+		}
+
+
+
+	  else if (_AlarmON.AlarmTime.Hours ==  _RTCTime.Hours && _AlarmON.AlarmTime.Minutes ==  _RTCTime.Minutes)
+	  	  {
+		  osMutexAcquire(MutexAlarmHandle, osWaitForever);
+			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
+			  osThreadFlagsSet(TaskPumpONHandle, 0x00000001U);
+			  _AlarmON.AlarmTime.Hours = _AlarmON.AlarmTime.Hours + 1;
+
+			  if(_AlarmON.AlarmTime.Hours == 24)
+				  {
+					  _AlarmON.AlarmTime.Hours = 8;
+				  }
+			  HAL_RTC_SetAlarm(&hrtc, &_AlarmON, RTC_FORMAT_BIN);
+			  osMutexRelease(MutexAlarmHandle);
+	  	  }
+	  else if(_AlarmOFF.AlarmTime.Hours ==  _RTCTime.Hours && _AlarmOFF.AlarmTime.Minutes ==  _RTCTime.Minutes )
+	  	  {
+		  	  osMutexAcquire(MutexAlarmHandle, osWaitForever);
+			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
+			  osThreadFlagsSet(TaskPumpOFFHandle, 0x00000010U);
+
+			  _AlarmOFF.AlarmTime.Hours = _AlarmOFF.AlarmTime.Hours + 1;
+			  HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+			  osMutexRelease(MutexAlarmHandle);
+
+	  	  }
+
+
+
 //	  if(RTCTime.Seconds != CompareSeconds)
 //	  {
 //
@@ -393,7 +552,7 @@ void StartTaskRTC(void *argument)
 	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 	  	  		}
 
-	  tick4 += ((60 * osKernelGetTickFreq()) / 1000);
+	  tick4 += ((70 * osKernelGetTickFreq()) / 1000);
 	  osDelayUntil(tick4);
   }
   /* USER CODE END StartTaskRTC */
@@ -433,7 +592,7 @@ void StartTaskBme280(void *argument)
 		printf("TASK BME280 \n\r ");
 //	  printf("Temperature: %.2f, Humidity: %.2f z \n\r", _BmeData.Temperature, _BmeData.Humidity);
 //////    osDelay(100);
-		tick3 += (90 * osKernelGetTickFreq()) / 1000;
+		tick3 += (80 * osKernelGetTickFreq()) / 1000;
 		osDelayUntil(tick3);
   }
   /* USER CODE END StartTaskBme280 */
@@ -501,17 +660,29 @@ void StartTaskSSD1306(void *argument)
 	char MessageTemp[32], MessageHum[32];
 	char MessageInten[32];
 	char MessageTime[32];
-	char Message
+	char MessageTimePump[32];
+
+	char MessageFreqAlarm[32];
+
 
 	BmeData_t _BmeData;
 	BHData_t _BHData;
 	RTC_TimeTypeDef _RTCTime;
- 	RTC_DateTypeDef _RTCDate;
-	uint32_t tick2;
 
-	osMutexAcquire(MutexI2CHandle, osWaitForever);
-	SSD1306_Init(&hi2c1);
-	osMutexRelease(MutexI2CHandle);
+	RTC_TimeTypeDef _PumpOperatingTime;
+ 	RTC_TimeTypeDef _AlarmPeriod;
+	uint32_t tick2;
+	_PumpOperatingTime.Hours = 0;
+	_PumpOperatingTime.Minutes = 1;
+	_PumpOperatingTime.Seconds = 0;
+
+	_AlarmPeriod.Hours = 1;
+	_AlarmPeriod.Minutes = 0;
+	_AlarmPeriod.Seconds = 0;
+
+	osMutexAcquire(MutexI2C2Handle, osWaitForever);
+	SSD1306_Init(&hi2c2);
+	osMutexRelease(MutexI2C2Handle);
 
 	GFX_SetFont(font_8x5);
 	SSD1306_Clear(BLACK);
@@ -523,49 +694,235 @@ void StartTaskSSD1306(void *argument)
   for(;;)
   {
 	  SSD1306_Clear(BLACK);
-	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, osWaitForever);
-	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, osWaitForever);
+	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, 10);
+	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, 10);
 //	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
-	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0,100);
+	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0, 10);
+
+//	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriodicty, 0, 50);
 
 
 	  sprintf(MessageTemp, "Temperature: %.2f ", _BmeData.Temperature);
 	  sprintf(MessageHum, "Humidity: %.2f", _BmeData.Humidity);
 	  sprintf(MessageInten, "Lx: %.2f,", _BHData.LightIntensity);
 //	  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
-	  sprintf(MessageTime, " Time: %02d:%02d:%02d",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+	  sprintf(MessageTime, "Time: %02d:%02d:%02d",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+//	  sprintf(MessageTimePump, "Pump OP Time: %02d Min",_PumpOperatingTime.Minutes);
+//	  sprintf(MessageFreqAlarm, "Alarm Period: %02d H", _AlarmPeriod.Hours);
 	  GFX_DrawString(0, 0, MessageTime, WHITE, 0);
 	  GFX_DrawString(0, 10, MessageTemp, WHITE, 0);
 	  GFX_DrawString(0, 20, MessageHum, WHITE, 0);
 	  GFX_DrawString(0, 30, MessageInten, WHITE, 0);
+//	  GFX_DrawString(0, 40, MessageTimePump, WHITE, 0);
+//	  GFX_DrawString(0, 50, MessageFreqAlarm, WHITE, 0);
 
 	  SSD1306_Display();
+
 	  printf("TASK OLED \n\r");
 
 //		printf("TASK OLED I2C MUTEX is released \n\r");
-      tick2 += (100 * osKernelGetTickFreq()) / 1000;
+      tick2 += (200 * osKernelGetTickFreq()) / 1000;
 	  osDelayUntil(tick2);
   }
   /* USER CODE END StartTaskSSD1306 */
 }
 
-/* USER CODE BEGIN Header_StartTaskPump */
+/* USER CODE BEGIN Header_StartTaskPumpON */
 /**
-* @brief Function implementing the TaskPump thread.
+* @brief Function implementing the TaskPumpON thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTaskPump */
-void StartTaskPump(void *argument)
+/* USER CODE END Header_StartTaskPumpON */
+void StartTaskPumpON(void *argument)
 {
-  /* USER CODE BEGIN StartTaskPump */
+  /* USER CODE BEGIN StartTaskPumpON */
+	drv8835_init();
   /* Infinite loop */
   for(;;)
   {
-	osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
-    osDelay(1000);
+
+
+	  osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
+	  drv8835_set_motorA_speed(100);
+	  osThreadFlagsClear(0x00000001U);
   }
-  /* USER CODE END StartTaskPump */
+  /* USER CODE END StartTaskPumpON */
+}
+
+/* USER CODE BEGIN Header_StartTaskPumpOFF */
+/**
+* @brief Function implementing the TaskPumpOFF thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskPumpOFF */
+void StartTaskPumpOFF(void *argument)
+{
+  /* USER CODE BEGIN StartTaskPumpOFF */
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  osThreadFlagsWait(0x00000010U, osFlagsWaitAny, osWaitForever);
+
+
+	  drv8835_set_motorA_speed(0);
+
+
+
+  }
+  /* USER CODE END StartTaskPumpOFF */
+}
+
+/* USER CODE BEGIN Header_StartTaskCounterPumpUp */
+/**
+* @brief Function implementing the TaskCounterUp thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskCounterPumpUp */
+void StartTaskCounterPumpUp(void *argument)
+{
+  /* USER CODE BEGIN StartTaskCounterPumpUp */
+	RTC_TimeTypeDef _PumpOperatingTime;
+	uint32_t tick;
+
+	tick= osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  	  osThreadFlagsWait(0x00000100U, osFlagsWaitAll, osWaitForever);
+		  osMessageQueueGet(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
+	  	  _PumpOperatingTime.Minutes = _PumpOperatingTime.Minutes + 1;
+
+	  	  if(_PumpOperatingTime.Minutes >= 59  )
+	  	  {
+	  		   _PumpOperatingTime.Minutes = 1;
+	  	  }
+
+	  	  osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
+
+
+
+	  	tick += (420 * osKernelGetTickFreq()) / 1000;
+	  	osDelayUntil(tick);
+
+
+
+  }
+  /* USER CODE END StartTaskCounterPumpUp */
+}
+
+/* USER CODE BEGIN Header_StartTaskCounterDown */
+/**
+* @brief Function implementing the TaskCounterDown thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskCounterDown */
+void StartTaskCounterDown(void *argument)
+{
+  /* USER CODE BEGIN StartTaskCounterDown */
+	RTC_TimeTypeDef _PumpOperatingTime;
+
+	uint32_t tick;
+	tick = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  	  	  osThreadFlagsWait(0x00001000U, osFlagsWaitAll, osWaitForever);
+
+	  		  osMessageQueueGet(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
+	  	      _PumpOperatingTime.Minutes = _PumpOperatingTime.Minutes - 1;
+
+	  	  	  if(_PumpOperatingTime.Minutes == 0 ||_PumpOperatingTime.Minutes >= 60 )
+	  	  	  {
+	  	  	        _PumpOperatingTime.Minutes = 59;
+	  	  	  }
+
+	  	  	  osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime,0,  100);
+
+
+
+	 tick += (410 * osKernelGetTickFreq()) / 1000;
+	osDelayUntil(tick);
+
+  }
+  /* USER CODE END StartTaskCounterDown */
+}
+
+/* USER CODE BEGIN Header_StartTaskAlarmCounterUp */
+/**
+* @brief Function implementing the TaskAlarmCounte thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskAlarmCounterUp */
+void StartTaskAlarmCounterUp(void *argument)
+{
+  /* USER CODE BEGIN StartTaskAlarmCounterUp */
+	RTC_TimeTypeDef _AlarmPeriod;
+
+
+
+	uint32_t tick;
+	tick = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+	  osThreadFlagsWait(0x00010000U, osFlagsWaitAll, osWaitForever);
+	  	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 100);
+	  	_AlarmPeriod.Hours= _AlarmPeriod.Hours + 1;
+
+	  	  	  	  	  if(_AlarmPeriod.Hours >= 16 )
+	  	  	  	  	  {
+	  	  	  	  		  	 _AlarmPeriod.Hours = 1;
+	  	  	  	  	  }
+
+	  	  osMessageQueuePut(QueueAlarmHandle, &_AlarmPeriod,0,  100);
+	  	osSemaphoreRelease(BinarySemSetAlarmHandle);
+
+	  tick += (390 * osKernelGetTickFreq()) / 1000;
+	  	osDelayUntil(tick);
+  }
+  /* USER CODE END StartTaskAlarmCounterUp */
+}
+
+/* USER CODE BEGIN Header_StartTaskAlarmCountDown */
+/**
+* @brief Function implementing the TaskAlarmCountD thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskAlarmCountDown */
+void StartTaskAlarmCountDown(void *argument)
+{
+  /* USER CODE BEGIN StartTaskAlarmCountDown */
+	RTC_AlarmTypeDef _AlarmPeriod;
+	uint32_t tick;
+	tick = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+	  osThreadFlagsWait(0x00100000U, osFlagsWaitAll, osWaitForever);
+	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 100);
+	  _AlarmPeriod.AlarmTime.Hours= _AlarmPeriod.AlarmTime.Hours - 1;
+
+	  	  	  	  if(_AlarmPeriod.AlarmTime.Hours == 0 ||_AlarmPeriod.AlarmTime.Hours >= 16 )
+	  	  	  	  {
+	  	  	  		  	  _AlarmPeriod.AlarmTime.Hours = 16;
+	  	  	  	  }
+
+	  osMessageQueuePut(QueueAlarmHandle, &_AlarmPeriod,0,  100);
+	  osSemaphoreRelease(BinarySemSetAlarmHandle);;
+
+	  tick += (380 * osKernelGetTickFreq()) / 1000;
+	  osDelayUntil(tick);
+  }
+  /* USER CODE END StartTaskAlarmCountDown */
 }
 
 /* CallbackTimerBmeData function */
@@ -596,23 +953,40 @@ void CallbackTimerRTC(void *argument)
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
-void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
-{
+
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
 //
-}
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == B1_Pin)
-	{
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-		drv8835_set_motorA_speed(100);
-	}
-	else if(GPIO_Pin == B2_Pin)
-	{
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-		drv8835_set_motorA_speed(0);
-	}
-}
+//	if(GPIO_Pin == B1_Pin)
+//	{
+//
+//
+//
+////		osThreadFlagsSet(TaskCounterUpHandle, 0x00000100U);
+//
+//
+//		osThreadFlagsSet(TaskAlarmCountUHandle, 0x00010000U);
+//
+//
+//
+//
+//
+//	}
+//	else if(GPIO_Pin == B2_Pin)
+//	{
+//
+//
+//
+////		osThreadFlagsSet(TaskCounterDownHandle, 0x00001000U);
+//
+//		osThreadFlagsSet(TaskAlarmCountDHandle, 0x00100000U);
+//	}
+//	else{
+//		__NOP();
+//	}
+//}
+
+
 void _putchar(char character) {
 	// send char to console etc.
 	osMutexAcquire(MutexPrintfHandle, osWaitForever);

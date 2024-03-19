@@ -10,7 +10,7 @@
 
 //#define SSD1306_USE_DMA
 
-#define SSD1306_TIMEOUT 1000
+#define SSD1306_TIMEOUT 80
 
 //
 // Registers

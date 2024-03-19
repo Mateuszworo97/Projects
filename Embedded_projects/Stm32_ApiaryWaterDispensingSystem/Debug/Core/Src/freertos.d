@@ -42,12 +42,16 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Core/Inc/stm32f4xx_it.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h \
  ../Core/Inc/printf.h ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Core/Inc/gpio.h ../Core/Inc/i2c.h ../Core/Inc/rtc.h \
  ../Core/Inc/bme280.h ../Core/Inc/tim.h ../Core/Inc/SSD1306_OLED.h \
- ../Core/Inc/bh1750.h ../Core/Inc/GFX_BW.h ../Core/Inc/fonts/font_8x5.h
+ ../Core/Inc/drv8835.h ../Core/Inc/bh1750.h ../Core/Inc/GFX_BW.h \
+ ../Core/Inc/fonts/font_8x5.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -92,6 +96,9 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Core/Inc/stm32f4xx_it.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h:
 ../Core/Inc/printf.h:
@@ -103,6 +110,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/bme280.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/SSD1306_OLED.h:
+../Core/Inc/drv8835.h:
 ../Core/Inc/bh1750.h:
 ../Core/Inc/GFX_BW.h:
 ../Core/Inc/fonts/font_8x5.h:

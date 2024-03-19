@@ -54,7 +54,6 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
-static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -103,11 +102,8 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   MX_RTC_Init();
-  MX_TIM3_Init();
   MX_TIM8_Init();
-
-  /* Initialize interrupts */
-  MX_NVIC_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -178,27 +174,13 @@ void SystemClock_Config(void)
   }
 }
 
-/**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
-{
-  /* RCC_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(RCC_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(RCC_IRQn);
-  /* EXTI4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
-}
-
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM10 interrupt took place, inside
+  * @note   This function is called  when TIM14 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -209,7 +191,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM10) {
+  if (htim->Instance == TIM14) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
