@@ -30,6 +30,8 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio_ex.h"
+#include "stm32f4xx_hal_rtc_ex.h"
+#include "stm32_hal_legacy.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_rtc.h"
 #include "stm32f4xx_hal_i2c.h"
@@ -490,7 +492,7 @@ void StartTaskRTC(void *argument)
 // 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
 
- 	osTimerStart(TimerRTCHandle, 200);
+ 	osTimerStart(TimerRTCHandle, 100);
  	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -501,19 +503,19 @@ void StartTaskRTC(void *argument)
 	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
 	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
-//	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
-	  if(osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
-		{
+////	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
+//	  if(osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
+//		{
+//
+//		  	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 100);
+//		  	  osMessageQueueGet(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
+//			  _AlarmOFF.AlarmTime.Minutes = _PumpOperatingTime.Minutes;
+//			  HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+//		}
 
-		  	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 100);
-		  	  osMessageQueueGet(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 100);
-			  _AlarmOFF.AlarmTime.Minutes = _PumpOperatingTime.Minutes;
-			  HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
-		}
 
 
-
-	  else if (_AlarmON.AlarmTime.Hours ==  _RTCTime.Hours && _AlarmON.AlarmTime.Minutes ==  _RTCTime.Minutes)
+	   if (_AlarmON.AlarmTime.Hours ==  _RTCTime.Hours && _AlarmON.AlarmTime.Minutes ==  _RTCTime.Minutes )
 	  	  {
 		  osMutexAcquire(MutexAlarmHandle, osWaitForever);
 			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
@@ -592,7 +594,7 @@ void StartTaskBme280(void *argument)
 		printf("TASK BME280 \n\r ");
 //	  printf("Temperature: %.2f, Humidity: %.2f z \n\r", _BmeData.Temperature, _BmeData.Humidity);
 //////    osDelay(100);
-		tick3 += (80 * osKernelGetTickFreq()) / 1000;
+		tick3 += (75 * osKernelGetTickFreq()) / 1000;
 		osDelayUntil(tick3);
   }
   /* USER CODE END StartTaskBme280 */
@@ -639,7 +641,7 @@ void StartTaskBH1750(void *argument)
 	  //	  	 	  	  	  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, size, 100);
 	  //	  	 	  	  }
 	  		printf("TASK BH1750 \n\r ");
-	  		tick4 += ((80 * osKernelGetTickFreq()) / 1000);
+	  		tick4 += ((65 * osKernelGetTickFreq()) / 1000);
 	  		osDelayUntil(tick4);
 
   }
@@ -662,23 +664,16 @@ void StartTaskSSD1306(void *argument)
 	char MessageTime[32];
 	char MessageTimePump[32];
 
-	char MessageFreqAlarm[32];
+
 
 
 	BmeData_t _BmeData;
 	BHData_t _BHData;
 	RTC_TimeTypeDef _RTCTime;
 
-	RTC_TimeTypeDef _PumpOperatingTime;
- 	RTC_TimeTypeDef _AlarmPeriod;
-	uint32_t tick2;
-	_PumpOperatingTime.Hours = 0;
-	_PumpOperatingTime.Minutes = 1;
-	_PumpOperatingTime.Seconds = 0;
 
-	_AlarmPeriod.Hours = 1;
-	_AlarmPeriod.Minutes = 0;
-	_AlarmPeriod.Seconds = 0;
+	uint32_t tick2;
+
 
 	osMutexAcquire(MutexI2C2Handle, osWaitForever);
 	SSD1306_Init(&hi2c2);
@@ -694,10 +689,10 @@ void StartTaskSSD1306(void *argument)
   for(;;)
   {
 	  SSD1306_Clear(BLACK);
-	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, 10);
-	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, 10);
+	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, osWaitForever);
+	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, osWaitForever);
 //	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
-	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0, 10);
+	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 
 //	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriodicty, 0, 50);
 
@@ -721,7 +716,7 @@ void StartTaskSSD1306(void *argument)
 	  printf("TASK OLED \n\r");
 
 //		printf("TASK OLED I2C MUTEX is released \n\r");
-      tick2 += (200 * osKernelGetTickFreq()) / 1000;
+      tick2 += (250 * osKernelGetTickFreq()) / 1000;
 	  osDelayUntil(tick2);
   }
   /* USER CODE END StartTaskSSD1306 */
@@ -737,6 +732,7 @@ void StartTaskSSD1306(void *argument)
 void StartTaskPumpON(void *argument)
 {
   /* USER CODE BEGIN StartTaskPumpON */
+
 	drv8835_init();
   /* Infinite loop */
   for(;;)
@@ -744,7 +740,8 @@ void StartTaskPumpON(void *argument)
 
 
 	  osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
-	  drv8835_set_motorA_speed(100);
+
+	  drv8835_set_motorA_speed(99);
 	  osThreadFlagsClear(0x00000001U);
   }
   /* USER CODE END StartTaskPumpON */
@@ -760,6 +757,7 @@ void StartTaskPumpON(void *argument)
 void StartTaskPumpOFF(void *argument)
 {
   /* USER CODE BEGIN StartTaskPumpOFF */
+
   /* Infinite loop */
   for(;;)
   {
@@ -985,6 +983,7 @@ void CallbackTimerRTC(void *argument)
 //		__NOP();
 //	}
 //}
+
 
 
 void _putchar(char character) {

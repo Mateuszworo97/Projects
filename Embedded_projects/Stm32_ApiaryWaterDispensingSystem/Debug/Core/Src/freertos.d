@@ -47,6 +47,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Core/Inc/stm32f4xx_it.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rtc_ex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
  ../Core/Inc/printf.h ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Core/Inc/gpio.h ../Core/Inc/i2c.h ../Core/Inc/rtc.h \
  ../Core/Inc/bme280.h ../Core/Inc/tim.h ../Core/Inc/SSD1306_OLED.h \
@@ -101,6 +103,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Core/Inc/stm32f4xx_it.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rtc_ex.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 ../Core/Inc/printf.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:

@@ -74,30 +74,30 @@ void SSD1306_Clear(uint8_t Color)
 
 void SSD1306_Display(void)
 {
-//	SSD1306_Command(SSD1306_PAGEADDR);
-//	SSD1306_Command(0);                      // Page start address
-//	SSD1306_Command(0xFF);                   // Page end (not really, but works here)
-//	SSD1306_Command(SSD1306_COLUMNADDR);
-//	SSD1306_Command(0); // Column start address
-//	SSD1306_Command(SSD1306_LCDWIDTH - 1); // Column end address
-//
-//	SSD1306_Data(buffer, SSD1306_BUFFER_SIZE);
-	for (uint8_t i = 0; i < 8 ; i++)
-		{
-			osMutexAcquire(MutexI2C2Handle, osWaitForever);
-//	//		printf("TASK OLED I2C MUTEX is taken \n\r");
-		    SSD1306_Command(SSD1306_PAGEADDR);
-		    SSD1306_Command(i);                      // Page start address
-			SSD1306_Command(i);                   // Page end (not really, but works here)
-			SSD1306_Command(SSD1306_COLUMNADDR);
-			SSD1306_Command(0); // Column start address
-			SSD1306_Command(SSD1306_LCDWIDTH - 1); // Column end address
+	SSD1306_Command(SSD1306_PAGEADDR);
+	SSD1306_Command(0);                      // Page start address
+	SSD1306_Command(0xFF);                   // Page end (not really, but works here)
+	SSD1306_Command(SSD1306_COLUMNADDR);
+	SSD1306_Command(0); // Column start address
+	SSD1306_Command(SSD1306_LCDWIDTH - 1); // Column end address
 
-			SSD1306_Data(buffer+(i * SSD1306_LCDWIDTH), SSD1306_LCDWIDTH);
-			osMutexRelease(MutexI2C2Handle);
-	//		printf("TASK OLED I2C MUTEX is released \n\r");
-			osThreadYield();
-		}
+	SSD1306_Data(buffer, SSD1306_BUFFER_SIZE);
+//	for (uint8_t i = 0; i < 8 ; i++)
+//		{
+//			osMutexAcquire(MutexI2C2Handle, osWaitForever);
+////	//		printf("TASK OLED I2C MUTEX is taken \n\r");
+//		    SSD1306_Command(SSD1306_PAGEADDR);
+//		    SSD1306_Command(i);                      // Page start address
+//			SSD1306_Command(i);                   // Page end (not really, but works here)
+//			SSD1306_Command(SSD1306_COLUMNADDR);
+//			SSD1306_Command(0); // Column start address
+//			SSD1306_Command(SSD1306_LCDWIDTH - 1); // Column end address
+//
+//			SSD1306_Data(buffer+(i * SSD1306_LCDWIDTH), SSD1306_LCDWIDTH);
+//			osMutexRelease(MutexI2C2Handle);
+//	//		printf("TASK OLED I2C MUTEX is released \n\r");
+//			osThreadYield();
+//		}
 }
 
 void SSD1306_Init(I2C_HandleTypeDef *i2c)
