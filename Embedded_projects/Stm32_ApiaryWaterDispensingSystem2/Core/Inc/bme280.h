@@ -1,7 +1,7 @@
 /*
  * bme280.h
  *
- *  Created on: 23 kwi 2023
+ *  The MIT License
  *      Author: Y700
  */
 

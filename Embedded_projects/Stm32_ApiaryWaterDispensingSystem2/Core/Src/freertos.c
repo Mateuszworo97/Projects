@@ -473,7 +473,7 @@ void StartTaskRTC(void *argument)
 	  			  osThreadFlagsSet(TaskPumpONHandle, 0x00000001U);
 	  			  _AlarmON.AlarmTime.Hours = _AlarmON.AlarmTime.Hours + _AlarmPeriod;
 
-	  			  if(_AlarmON.AlarmTime.Hours >= 24 || _AlarmON.AlarmTime.Hours <= 8)
+	  			  if(_AlarmON.AlarmTime.Hours >= 22 || _AlarmON.AlarmTime.Hours <= 8)
 	  				  {
 	  					  _AlarmON.AlarmTime.Hours = 8;
 	  				  }
@@ -488,7 +488,7 @@ void StartTaskRTC(void *argument)
 
 	  			  _AlarmOFF.AlarmTime.Hours = _AlarmOFF.AlarmTime.Hours + _AlarmPeriod;
 
-	  			if(_AlarmOFF.AlarmTime.Hours >= 24 || _AlarmOFF.AlarmTime.Hours <= 8)
+	  			if(_AlarmOFF.AlarmTime.Hours >= 22 || _AlarmOFF.AlarmTime.Hours <= 8)
 	  			  	 {
 	  			  		  _AlarmOFF.AlarmTime.Hours = 8;
 	  			  	 }
