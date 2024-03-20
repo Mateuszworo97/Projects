@@ -1,0 +1,13 @@
+../Core/Src/freertos.c:265:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:388:6:StartTaskRTC	128	static
+../Core/Src/freertos.c:528:6:StartTaskBme280	40	static
+../Core/Src/freertos.c:568:6:StartTaskBH1750	24	static
+../Core/Src/freertos.c:614:6:StartTaskSSD1306	264	static
+../Core/Src/freertos.c:709:6:StartTaskPumpON	16	static
+../Core/Src/freertos.c:732:6:StartTaskPumpOFF	16	static
+../Core/Src/freertos.c:754:6:StartTaskCounterPump	24	static
+../Core/Src/freertos.c:794:6:StartTaskAlarmCounter	24	static
+../Core/Src/freertos.c:828:6:CallbackTimerBmeData	16	static
+../Core/Src/freertos.c:836:6:CallbackTimerBh1750Data	16	static
+../Core/Src/freertos.c:844:6:CallbackTimerRTC	16	static
+../Core/Src/freertos.c:878:6:_putchar	16	static
