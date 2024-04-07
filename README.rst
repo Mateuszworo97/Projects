@@ -1,5 +1,5 @@
 
-
+.. contents::
 About
 ====
 
@@ -22,8 +22,6 @@ The next time the alarm will turn on will be increased by the hour value display
 we can delay the pump activation value from 1 to 16.
 
 
-
-.. contents::
 
 
 Components
