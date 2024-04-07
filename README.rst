@@ -14,7 +14,7 @@ In the future, this project will be developed with additional functionalities.
 
 
 
-Current operation and functionalities
+Operation
 ====
 
 
