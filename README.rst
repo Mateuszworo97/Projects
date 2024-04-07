@@ -16,6 +16,7 @@ In the future, this project will be developed with additional functionalities.
 Current operation and functionalities
 ------------
 
+
 The system measures time, temperature, humidity and light intensity. The data is shown on the display.
 By default, the pump is turned on for 1 minute. Every hour.
 Using push buttons, we can increase the pump activation time from 1 to 59 minutes.
