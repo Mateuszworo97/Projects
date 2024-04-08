@@ -2,7 +2,7 @@
  .. contents::
 
 About
-====
+----
 
 
 Apiary Water Dispensing System - This is a device design whose purpose is to automatically supply bee water from an underground tank.
@@ -15,7 +15,7 @@ In the future, this project will be developed with additional functionalities.
 
 
 Operation
-====
+----
 
 
 The system measures time, temperature, humidity and light intensity. The data is shown on the display.
@@ -30,7 +30,7 @@ we can delay the pump activation value from 1 to 16.
 
 
 Components
-====
+----
 
 Contains a list of components used to build the system
 
@@ -39,7 +39,7 @@ Refer to `docs/components.rst`.
 
 
 Hardware
-====
+----
 
 Contains documentation of the sensors and components used.
 -Diagram of the electronic system of the device.
@@ -50,13 +50,11 @@ Refer to `docs/hardware`.
 
 
 Software
-====
+----
 
 -Diagram of the software nic system of the device.
 Refer to `docs/software`.
 
 
 License
-====
-
-
+----
