@@ -1,0 +1,4 @@
+22:11:15: can't write to file descriptor 3 (error 112: za mało miejsca na dysku.)
+22:11:15: can't write user configuration file.
+22:11:15: can't write to file descriptor 3 (error 112: za mało miejsca na dysku.)
+22:11:15: can't write user configuration file.

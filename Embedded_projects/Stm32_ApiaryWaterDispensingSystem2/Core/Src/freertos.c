@@ -614,7 +614,7 @@ void StartTaskBH1750(void *argument)
 void StartTaskSSD1306(void *argument)
 {
   /* USER CODE BEGIN StartTaskSSD1306 */
-
+	char MessagePointer[32];
 	char MessageTemp[32], MessageHum[32];
 	char MessageInten[32];
 	char MessageTime[32];
@@ -631,6 +631,7 @@ void StartTaskSSD1306(void *argument)
 
 
 	uint32_t tick2;
+	uint8_t i =1;
 
 
 	osMutexAcquire(MutexI2C2Handle, osWaitForever);
@@ -686,10 +687,14 @@ void StartTaskSSD1306(void *argument)
 	  	  GFX_DrawString(0, 20, MessageHum, WHITE, 0);
 	  	  GFX_DrawString(0, 30, MessageInten, WHITE, 0);
 	  	  GFX_DrawString(0, 40, MessageTimePump, WHITE, 0);
+	  	  if(i%3 ==0)
+	  	  {
 	  	  GFX_DrawString(0, 50, MessageFreqAlarm, WHITE, 0);
+	  	  i=1;
+	  	  }
 
 	  	  SSD1306_Display();
-
+	  	  i=i+1;
 	  	  printf("TASK OLED \n\r");
 
 	  //		printf("TASK OLED I2C MUTEX is released \n\r");
@@ -778,7 +783,7 @@ void StartTaskCounterPump(void *argument)
 	 		   osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
 	 	  }
 
-	 	  	  	tick += (120 * osKernelGetTickFreq()) / 1000;
+	 	  	  	tick += (220 * osKernelGetTickFreq()) / 1000;
 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskCounterPump */
@@ -818,7 +823,7 @@ void StartTaskAlarmCounter(void *argument)
 	 	 		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
 	 	 	  }
 
-	 	 	  	  	tick += (100 * osKernelGetTickFreq()) / 1000;
+	 	 	  	  	tick += (200 * osKernelGetTickFreq()) / 1000;
 	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskAlarmCounter */

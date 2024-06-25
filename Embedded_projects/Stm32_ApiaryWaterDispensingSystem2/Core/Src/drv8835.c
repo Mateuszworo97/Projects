@@ -22,7 +22,7 @@ void drv8835_mode_control(DRV8835_Mode mode)
 
 void drv8835_set_motorA_direction(DRV8835_Direction dir)
 {
-	if(dir == CW)
+	if(dir == CeW)
 		HAL_GPIO_WritePin(APHASE_GPIO_Port, APHASE_Pin, SET);
 	else if(dir == CCW)
 		HAL_GPIO_WritePin(APHASE_GPIO_Port, APHASE_Pin, RESET);
