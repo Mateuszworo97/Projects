@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "rtc.h"
 #include "spi.h"
@@ -99,6 +100,7 @@ int main(void)
   MX_RTC_Init();
   MX_TIM3_Init();
   MX_SPI3_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
