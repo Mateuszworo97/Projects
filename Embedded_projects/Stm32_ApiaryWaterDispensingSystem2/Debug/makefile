@@ -69,7 +69,7 @@ main-build: Stm32_ApiaryWaterDispensingSystem2.elf secondary-outputs
 
 # Tool invocations
 Stm32_ApiaryWaterDispensingSystem2.elf Stm32_ApiaryWaterDispensingSystem2.map: $(OBJS) $(USER_OBJS) G:\Github\ Projects\Projects\Embedded_projects\Stm32_ApiaryWaterDispensingSystem2\STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Stm32_ApiaryWaterDispensingSystem2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"G:\Github Projects\Projects\Embedded_projects\Stm32_ApiaryWaterDispensingSystem2\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Stm32_ApiaryWaterDispensingSystem2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "Stm32_ApiaryWaterDispensingSystem2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"G:\Github Projects\Projects\Embedded_projects\Stm32_ApiaryWaterDispensingSystem2\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Stm32_ApiaryWaterDispensingSystem2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

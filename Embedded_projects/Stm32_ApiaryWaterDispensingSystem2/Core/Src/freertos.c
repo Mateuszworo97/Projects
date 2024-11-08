@@ -53,9 +53,11 @@
 #include "SSD1306_OLED.h"
 #include "drv8835.h"
 #include "INA219.h"
+#include "ds3231.h"
 
 #include "bh1750.h"
 #include "ff.h"
+#include "ff_gen_drv.h"
 #include "user_diskio_spi.h"
 #include "user_diskio.h"
 #include "GFX_BW.h"
@@ -79,6 +81,15 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+typedef struct {
+		uint8_t Hour;
+		uint8_t Minutes;
+		uint8_t Seconds;
+		uint8_t Day;
+		uint8_t Month;
+		uint16_t Year;
+}Ds3231_t;
 typedef struct {
 	float Humidity;
 	float Temperature;
@@ -88,6 +99,7 @@ typedef struct {
 typedef struct{
 	uint16_t VoltageBus;
 	uint16_t VoltageShunt;
+	uint16_t Power;
 	int16_t Current;
 
 }INA219Data_t;
@@ -102,7 +114,11 @@ typedef struct {
 	char MessagePvVoltageBus[32];
 	char MessagePVVoltageShunt[32];
 	char MessagePVCurrent[32];
-	char BatteryVoltage[32];
+	char MessagePVPower[32];
+	char MessageBatVoltageBus[32];
+	char MessageBatVoltageShunt[32];
+	char MessageBatCurrent[32];
+	char MessageBatPower[32];
 	char MessageFreqAlarm[32];
 
 }Data_Structure_t;
@@ -125,7 +141,7 @@ osThreadId_t TaskBme280Handle;
 const osThreadAttr_t TaskBme280_attributes = {
   .name = "TaskBme280",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for TaskBH1750 */
 osThreadId_t TaskBH1750Handle;
@@ -138,7 +154,7 @@ const osThreadAttr_t TaskBH1750_attributes = {
 osThreadId_t TaskSSD1306Handle;
 const osThreadAttr_t TaskSSD1306_attributes = {
   .name = "TaskSSD1306",
-  .stack_size = 3400 * 4,
+  .stack_size = 4000 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskPumpON */
@@ -173,15 +189,29 @@ const osThreadAttr_t TaskAlarmCounte_attributes = {
 osThreadId_t TaskSdCardHandle;
 const osThreadAttr_t TaskSdCard_attributes = {
   .name = "TaskSdCard",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .stack_size = 3000 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskINA219 */
 osThreadId_t TaskINA219Handle;
 const osThreadAttr_t TaskINA219_attributes = {
   .name = "TaskINA219",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for TaskINA219PV */
+osThreadId_t TaskINA219PVHandle;
+const osThreadAttr_t TaskINA219PV_attributes = {
+  .name = "TaskINA219PV",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
+/* Definitions for TaskDS3231 */
+osThreadId_t TaskDS3231Handle;
+const osThreadAttr_t TaskDS3231_attributes = {
+  .name = "TaskDS3231",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for QueueBme */
 osMessageQueueId_t QueueBmeHandle;
@@ -223,10 +253,20 @@ osMessageQueueId_t QuequeBatteryHandle;
 const osMessageQueueAttr_t QuequeBattery_attributes = {
   .name = "QuequeBattery"
 };
-/* Definitions for QuequePV */
-osMessageQueueId_t QuequePVHandle;
-const osMessageQueueAttr_t QuequePV_attributes = {
-  .name = "QuequePV"
+/* Definitions for QueDs3231Time */
+osMessageQueueId_t QueDs3231TimeHandle;
+const osMessageQueueAttr_t QueDs3231Time_attributes = {
+  .name = "QueDs3231Time"
+};
+/* Definitions for QueueDs3231Date */
+osMessageQueueId_t QueueDs3231DateHandle;
+const osMessageQueueAttr_t QueueDs3231Date_attributes = {
+  .name = "QueueDs3231Date"
+};
+/* Definitions for QueuePV */
+osMessageQueueId_t QueuePVHandle;
+const osMessageQueueAttr_t QueuePV_attributes = {
+  .name = "QueuePV"
 };
 /* Definitions for TimerBmeData */
 osTimerId_t TimerBmeDataHandle;
@@ -252,6 +292,11 @@ const osTimerAttr_t TimerSDCard_attributes = {
 osTimerId_t TimerINA219Handle;
 const osTimerAttr_t TimerINA219_attributes = {
   .name = "TimerINA219"
+};
+/* Definitions for TimerINA219Bat */
+osTimerId_t TimerINA219BatHandle;
+const osTimerAttr_t TimerINA219Bat_attributes = {
+  .name = "TimerINA219Bat"
 };
 /* Definitions for MutexPrintf */
 osMutexId_t MutexPrintfHandle;
@@ -318,6 +363,16 @@ osSemaphoreId_t BinarySemINA219Handle;
 const osSemaphoreAttr_t BinarySemINA219_attributes = {
   .name = "BinarySemINA219"
 };
+/* Definitions for BinaryDs3231 */
+osSemaphoreId_t BinaryDs3231Handle;
+const osSemaphoreAttr_t BinaryDs3231_attributes = {
+  .name = "BinaryDs3231"
+};
+/* Definitions for BinarySemIna219Bat */
+osSemaphoreId_t BinarySemIna219BatHandle;
+const osSemaphoreAttr_t BinarySemIna219Bat_attributes = {
+  .name = "BinarySemIna219Bat"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -335,11 +390,14 @@ void StartTaskCounterPump(void *argument);
 void StartTaskAlarmCounter(void *argument);
 void StartTaskSdCard(void *argument);
 void StartTaskINA219(void *argument);
+void StartTaskINA219PV(void *argument);
+void StartTaskDS3231(void *argument);
 void CallbackTimerBmeData(void *argument);
 void CallbackTimerBh1750Data(void *argument);
 void CallbackTimerRTC(void *argument);
 void CallbackTimerSDCard(void *argument);
 void CallbackTimerINA219(void *argument);
+void CallbackTimerINA219Bat(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -397,6 +455,12 @@ void MX_FREERTOS_Init(void) {
   /* creation of BinarySemINA219 */
   BinarySemINA219Handle = osSemaphoreNew(1, 1, &BinarySemINA219_attributes);
 
+  /* creation of BinaryDs3231 */
+  BinaryDs3231Handle = osSemaphoreNew(1, 1, &BinaryDs3231_attributes);
+
+  /* creation of BinarySemIna219Bat */
+  BinarySemIna219BatHandle = osSemaphoreNew(1, 1, &BinarySemIna219Bat_attributes);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -417,6 +481,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of TimerINA219 */
   TimerINA219Handle = osTimerNew(CallbackTimerINA219, osTimerPeriodic, NULL, &TimerINA219_attributes);
 
+  /* creation of TimerINA219Bat */
+  TimerINA219BatHandle = osTimerNew(CallbackTimerINA219Bat, osTimerPeriodic, NULL, &TimerINA219Bat_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
@@ -429,10 +496,10 @@ void MX_FREERTOS_Init(void) {
   QueueBh1750Handle = osMessageQueueNew (5, sizeof(BHData_t), &QueueBh1750_attributes);
 
   /* creation of QueueRTCData */
-  QueueRTCDataHandle = osMessageQueueNew (5, sizeof(RTC_DateTypeDef), &QueueRTCData_attributes);
+  QueueRTCDataHandle = osMessageQueueNew (1, sizeof(RTC_DateTypeDef), &QueueRTCData_attributes);
 
   /* creation of QueueRTCTime */
-  QueueRTCTimeHandle = osMessageQueueNew (5, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
+  QueueRTCTimeHandle = osMessageQueueNew (1, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
 
   /* creation of QueueCounterPump */
   QueueCounterPumpHandle = osMessageQueueNew (1, sizeof(uint8_t), &QueueCounterPump_attributes);
@@ -444,10 +511,16 @@ void MX_FREERTOS_Init(void) {
   QueSDCARDHandle = osMessageQueueNew (1, sizeof(Data_Structure_t), &QueSDCARD_attributes);
 
   /* creation of QuequeBattery */
-  QuequeBatteryHandle = osMessageQueueNew (16, sizeof(INA219Data_t), &QuequeBattery_attributes);
+  QuequeBatteryHandle = osMessageQueueNew (2, sizeof(INA219Data_t), &QuequeBattery_attributes);
 
-  /* creation of QuequePV */
-  QuequePVHandle = osMessageQueueNew (16, sizeof(INA219Data_t), &QuequePV_attributes);
+  /* creation of QueDs3231Time */
+  QueDs3231TimeHandle = osMessageQueueNew (1, sizeof(RTC_TimeTypeDef), &QueDs3231Time_attributes);
+
+  /* creation of QueueDs3231Date */
+  QueueDs3231DateHandle = osMessageQueueNew (1, sizeof(RTC_DateTypeDef), &QueueDs3231Date_attributes);
+
+  /* creation of QueuePV */
+  QueuePVHandle = osMessageQueueNew (1, sizeof(INA219Data_t), &QueuePV_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -484,6 +557,12 @@ void MX_FREERTOS_Init(void) {
   /* creation of TaskINA219 */
   TaskINA219Handle = osThreadNew(StartTaskINA219, NULL, &TaskINA219_attributes);
 
+  /* creation of TaskINA219PV */
+  TaskINA219PVHandle = osThreadNew(StartTaskINA219PV, NULL, &TaskINA219PV_attributes);
+
+  /* creation of TaskDS3231 */
+  TaskDS3231Handle = osThreadNew(StartTaskDS3231, NULL, &TaskDS3231_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -504,10 +583,13 @@ void MX_FREERTOS_Init(void) {
 void StartTaskRTC(void *argument)
 {
   /* USER CODE BEGIN StartTaskRTC */
-	extern RTC_HandleTypeDef hrtc;
-	 	 RTC_TimeTypeDef _RTCTime;
-	 	 RTC_DateTypeDef _RTCDate;
-	 	 RTC_AlarmTypeDef _AlarmON, _AlarmOFF;
+		extern RTC_HandleTypeDef hrtc;
+
+	 	 RTC_TimeTypeDef _RTCTime ={0};
+
+	 	 RTC_DateTypeDef _RTCDate = {0};
+
+	 	 RTC_AlarmTypeDef _AlarmON, _AlarmOFF = {0};
 
 
 	 	static uint8_t _PumpDispensing = 1;
@@ -530,37 +612,78 @@ void StartTaskRTC(void *argument)
 
 
 
-
+		osThreadFlagsSet(TaskDS3231Handle, 0x00000100U);
 	 	HAL_RTC_Init(&hrtc);
-		HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
-		HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
-		HAL_RTC_SetAlarm(&hrtc, &_AlarmON, RTC_FORMAT_BIN);
-		HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+//		HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+//		HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+
+//		HAL_RTC_SetAlarm(&hrtc, &_AlarmON, RTC_FORMAT_BIN);
+//		HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+
 
 	// 	_RTCTime.Hours = 0x0;
 	//    _RTCTime.Minutes =0x0;
 	//	_RTCTime.Seconds =0x0;
-	// 	HAL_RTC_SetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
-	// 	HAL_RTC_SetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
 
 		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
 		osMessageQueuePut(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
-	 	osTimerStart(TimerRTCHandle, 100);
+	 	osTimerStart(TimerRTCHandle, 300);
 	 	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
 	  //	  osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime, 0, 10);
 	  //	  osMessageQueuePut(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
-	  printf("Task RTC start \n\r ");
-	  	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
-	  	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+
+	      printf("Task RTC start \n\r ");
+	      if(osOK== osMessageQueueGet(QueDs3231TimeHandle, &_RTCTime, 0, 50))
+	      {
+	    	  HAL_RTC_SetTime(&hrtc,&_RTCTime, RTC_FORMAT_BIN);
+	    	  if (_RTCTime.Hours +1 <=22)
+				  {  	  _AlarmON.AlarmTime.Hours = _RTCTime.Hours + 1  ;
+						 _AlarmON.AlarmTime.Minutes = 0;
+						_AlarmON.AlarmTime.Seconds = 0 ;
+
+						 _AlarmOFF.AlarmTime.Hours = _RTCTime.Hours + 1 ;
+						 _AlarmOFF.AlarmTime.Minutes = 1 ;
+						 _AlarmOFF.AlarmTime.Seconds = 0 ;
+				  }
+	    	  else
+				  {
+					  _AlarmON.AlarmTime.Hours = 8 	;
+					  _AlarmON.AlarmTime.Minutes = 0;
+					  _AlarmON.AlarmTime.Seconds = 0 ;
+					  _AlarmOFF.AlarmTime.Hours = 8 ;
+					 _AlarmOFF.AlarmTime.Minutes = 1 ;
+					 _AlarmOFF.AlarmTime.Seconds = 0 ;
+				  }
+	    	  HAL_RTC_SetAlarm(&hrtc, &_AlarmON, RTC_FORMAT_BIN);
+	    	  HAL_RTC_SetAlarm(&hrtc, &_AlarmOFF, RTC_FORMAT_BIN);
+
+	    	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+
+	      }
+	      else if(osOK == osMessageQueueGet(QueueDs3231DateHandle, &_RTCDate, 0, 50))
+	      {
+	    	  HAL_RTC_SetDate(&hrtc,&_RTCDate, RTC_FORMAT_BIN);
+	    	  HAL_RTC_GetDate(&hrtc,&_RTCDate, RTC_FORMAT_BIN);
+	      }
+	      else
+	      {
+	    	  HAL_RTC_GetDate(&hrtc, &_RTCDate, RTC_FORMAT_BIN);
+	    	  HAL_RTC_GetTime(&hrtc, &_RTCTime, RTC_FORMAT_BIN);
+	      }
+
+
+
+
+
 
 	  	if (osOK == osSemaphoreAcquire(BinarySemCounterHandle, 0))
 	  	{
 	  		osMessageQueueGet(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
-	  		_AlarmOFF.AlarmTime.Minutes = _PumpDispensing;
+//	  		_AlarmOFF.AlarmTime.Minutes = _PumpDispensing;
 
 	  	}
 	  	else if (osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
@@ -584,7 +707,7 @@ void StartTaskRTC(void *argument)
 
 	  	   if (_AlarmON.AlarmTime.Hours ==  _RTCTime.Hours && _AlarmON.AlarmTime.Minutes ==  _RTCTime.Minutes )
 	  	  	  {
-	  		  osMutexAcquire(MutexAlarmHandle, osWaitForever);
+	  		      osMutexAcquire(MutexAlarmHandle, osWaitForever);
 	  			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
 	  			  osThreadFlagsSet(TaskPumpONHandle, 0x00000001U);
 	  			  _AlarmON.AlarmTime.Hours = _AlarmON.AlarmTime.Hours + _AlarmPeriod;
@@ -613,6 +736,10 @@ void StartTaskRTC(void *argument)
 	  			  osMutexRelease(MutexAlarmHandle);
 
 	  	  	  }
+	  	  else if (_RTCTime.Hours == 23 && _RTCTime.Minutes == 59)
+	  	  {
+	  		osThreadFlagsSet(TaskDS3231Handle, 0x00000100U);
+	  	  }
 
 
 
@@ -627,8 +754,11 @@ void StartTaskRTC(void *argument)
 	  	  	  			osMessageQueuePut(QueueRTCTimeHandle, &_RTCTime, 0, osWaitForever);
 	  	  	  			osMessageQueuePut(QueueRTCDataHandle, &_RTCDate, 0, osWaitForever);
 	  	  	  		}
+
+
+
 	  	  printf("Task RTC exit \n\r ");
-	  	  tick4 += ((70 * osKernelGetTickFreq()) / 1000);
+	  	  tick4 += ((220 * osKernelGetTickFreq()) / 1000);
 	  	  osDelayUntil(tick4);
 
   }
@@ -650,9 +780,10 @@ void StartTaskBme280(void *argument)
 		osMutexAcquire(MutexI2CHandle, osWaitForever);
 		BME280_Init(&hi2c1, BME280_TEMPERATURE_16BIT, BME280_PRESSURE_ULTRALOWPOWER,
 		BME280_HUMINIDITY_STANDARD, BME280_NORMALMODE);
+		osDelay(100);
 		BME280_SetConfig(BME280_STANDBY_MS_10, BME280_FILTER_OFF);
 		osMutexRelease(MutexI2CHandle);
-		osTimerStart(TimerBmeDataHandle, 300);
+		osTimerStart(TimerBmeDataHandle, 400);
 
 		tick3 = osKernelGetTickCount();
   /* Infinite loop */
@@ -672,7 +803,7 @@ void StartTaskBme280(void *argument)
 
 	  //	  printf("Temperature: %.2f, Humidity: %.2f z \n\r", _BmeData.Temperature, _BmeData.Humidity);
 	  //////    osDelay(100);
-	  		tick3 += (235 * osKernelGetTickFreq()) / 1000;
+	  		tick3 += (335 * osKernelGetTickFreq()) / 1000;
 	  		osDelayUntil(tick3);
   }
   /* USER CODE END StartTaskBme280 */
@@ -688,7 +819,7 @@ void StartTaskBme280(void *argument)
 void StartTaskBH1750(void *argument)
 {
   /* USER CODE BEGIN StartTaskBH1750 */
-	uint32_t tick4;
+		uint32_t tick4;
 		BHData_t _BHData;
 
 		//	float BH1750_lux;
@@ -698,7 +829,7 @@ void StartTaskBH1750(void *argument)
 		BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
 		osMutexRelease(MutexI2CHandle);
 
-		osTimerStart(TimerBh1750DataHandle, 200);
+		osTimerStart(TimerBh1750DataHandle, 500);
 		tick4 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -720,7 +851,7 @@ void StartTaskBH1750(void *argument)
 	 	  //	  	 	  	  	  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, size, 100);
 	 	  //	  	 	  	  }
 
-	 	  		tick4 += ((165 * osKernelGetTickFreq()) / 1000);
+	 	  		tick4 += ((325 * osKernelGetTickFreq()) / 1000);
 	 	  		osDelayUntil(tick4);
   }
   /* USER CODE END StartTaskBH1750 */
@@ -743,17 +874,20 @@ void StartTaskSSD1306(void *argument)
 
 	BmeData_t _BmeData;
 	BHData_t _BHData;
-	INA219Data_t _INA219_Battery;
+	INA219Data_t _INA219_Battery ={0};
+	INA219Data_t _INA219_PV ={0};
 
-	RTC_TimeTypeDef _RTCTime;
-	RTC_DateTypeDef _RTCData;
+	RTC_TimeTypeDef _RTCTime2 = {0};
+	 _RTCTime2.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	 	 _RTCTime2.StoreOperation = RTC_STOREOPERATION_RESET;
+	RTC_DateTypeDef _RTCData2 = {0};
 	uint8_t _AlarmPeriod = 1;
 
 	uint8_t _PumpDispensing = 1;
 
 
 	uint32_t tick2;
-	uint8_t i =1;
+
 
 
 
@@ -764,7 +898,8 @@ void StartTaskSSD1306(void *argument)
 	GFX_SetFont(font_8x5);
 	SSD1306_Clear(BLACK);
 	SSD1306_Display();
-	osTimerStart(TimerSDCardHandle, 20000);
+
+	osTimerStart(TimerSDCardHandle, 300000);
 	tick2 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -775,12 +910,26 @@ void StartTaskSSD1306(void *argument)
 	  	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, 50);
 	  	  printf("2\n\r");
 	  //	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
-	  	  osMessageQueueGet(QuequePVHandle, &_INA219_Battery, 0, 50);
-	  	printf("3\n\r");
-	  	  osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime, 0, 50);
-	  	printf("4\n\r");
-	  	  osMessageQueueGet(QueueRTCDataHandle, &_RTCData, 0, 50);
-	  	printf("5\n\r");
+
+
+	  	  osMessageQueueGet(QuequeBatteryHandle, &_INA219_Battery, 0, 50);
+	      printf("3\n\r");
+	      osMessageQueueGet(QueuePVHandle, &_INA219_PV, 0, 100);
+	    	  	  printf("4\n\r");
+	  	  if (osOK == osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime2, 0, 50))
+	  	  {
+
+
+	  		  printf("5\n\r");
+	  	  }
+
+	  	  if(osOK == osMessageQueueGet(QueueRTCDataHandle, &_RTCData2, 0, 50))
+	  	  {
+
+
+	  		  printf("6\n\r");
+	  	  }
+
 
 
 
@@ -798,23 +947,30 @@ void StartTaskSSD1306(void *argument)
 	  		   osSemaphoreRelease(BinarySemSetAlarmHandle);
 
 	  	 }
+
+
 //	  	   osMessageQueueGet(QueueCounterAlarmHandle, &_AlarmPeriod, 0, 50);
 
 
 //	  	   osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime, 0, osWaitForever);
-	  	  sprintf(PointerData->MessageData, "Data: %02d:%02d:%02d;",_RTCData.Date,_RTCData.Month,_RTCData.Year);
-	      sprintf(PointerData->MessageTime, "Time: %02d:%02d:%02d;",_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
-	  	  sprintf(PointerData->MessageTemp, "Temperature: %.2f; ", _BmeData.Temperature);
-	  	  sprintf(PointerData->MessageHum, "Humidity: %.2f;", _BmeData.Humidity);
-	  	  sprintf(PointerData->MessageInten, "Lx: %.2f;", _BHData.LightIntensity);
-	  	  sprintf(PointerData->MessagePvVoltageBus,"Battery Voltage bus: %u;",_INA219_Battery.VoltageBus);
-	  	  sprintf(PointerData->MessagePVVoltageShunt,"Battery Voltage shunt: %u;",_INA219_Battery.VoltageShunt);
-	  	  sprintf(PointerData->MessagePVCurrent,"Current: %d;",_INA219_Battery.Current);
-	  //  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
+	  	  sprintf(PointerData->MessageData, "Data: %02d.%02d.%02d;",_RTCData2.Date,_RTCData2.Month,_RTCData2.Year);
+	      sprintf(PointerData->MessageTime, "%02d:%02d:%02d;",_RTCTime2.Hours,_RTCTime2.Minutes,_RTCTime2.Seconds);
+	  	  sprintf(PointerData->MessageTemp, "T:%.2f C; ", _BmeData.Temperature);
+	  	  sprintf(PointerData->MessageHum, "%.2f %;", _BmeData.Humidity);
+	  	  sprintf(PointerData->MessageInten, "%.2f lx;", _BHData.LightIntensity);
+	  	  sprintf(PointerData->MessageBatVoltageBus,"B:%u mV;", _INA219_Battery.VoltageBus);
+	  	  sprintf(PointerData->MessageBatVoltageShunt,"B s:%u;",_INA219_Battery.VoltageShunt);
+	  	  sprintf(PointerData->MessageBatCurrent,"B:%d mA;",_INA219_Battery.Current);
+	  	  sprintf(PointerData->MessageBatPower,"B:%d mW;",_INA219_Battery.Power);
+	  	  sprintf(PointerData->MessagePvVoltageBus,"P:%umV;",_INA219_PV.VoltageBus);
+	      sprintf(PointerData->MessagePVVoltageShunt,"PV Voltage shunt: %u;",_INA219_PV.VoltageShunt);
+	  	  sprintf(PointerData->MessagePVCurrent,"P:%d mA;",_INA219_PV.Current);
+	  	  sprintf(PointerData->MessagePVPower,"P:%u mW;",_INA219_PV.Power);
+	  	  //  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
 
 
-	  	  sprintf(PointerData->MessageTimePump, "Pump OP Time: %02d Min;",_PumpDispensing);
-	  	  sprintf(PointerData->MessageFreqAlarm, "Alarm Period: %02d H;", _AlarmPeriod);
+	  	  sprintf(PointerData->MessageTimePump, "Pump:%02dMin;",_PumpDispensing);
+	  	  sprintf(PointerData->MessageFreqAlarm, "Alarm:%02dH;", _AlarmPeriod);
 
 	  	if (osOK == osSemaphoreAcquire(BinarySdCardHandle, 0)) {
 	  		  	  			osMessageQueuePut(QueSDCARDHandle,PointerData, 0, 50);
@@ -824,20 +980,20 @@ void StartTaskSSD1306(void *argument)
 
 
 	  	  GFX_DrawString(0, 0, PointerData->MessageTime, WHITE, 0);
+	  	  GFX_DrawString(70,0, PointerData->MessageBatVoltageBus,WHITE,0);
 	  	  GFX_DrawString(0, 10, PointerData->MessageTemp, WHITE, 0);
+	  	 GFX_DrawString(70,10, PointerData->MessageBatCurrent,WHITE,0);
 	  	  GFX_DrawString(0, 20, PointerData->MessageHum, WHITE, 0);
+	  	GFX_DrawString(70,20, PointerData->MessageBatPower,WHITE,0);
 	  	  GFX_DrawString(0, 30, PointerData->MessageInten, WHITE, 0);
+	  	 GFX_DrawString(70,30, PointerData->MessagePvVoltageBus,WHITE,0);
 	  	  GFX_DrawString(0, 40, PointerData->MessageTimePump, WHITE, 0);
-
-
-	  	  if(i%3 ==0)
-	  	  {
+	  	GFX_DrawString(70,40, PointerData->MessagePVCurrent,WHITE,0);
 	  	  GFX_DrawString(0, 50, PointerData->MessageFreqAlarm, WHITE, 0);
-	  	  i=1;
-	  	  }
+	  	GFX_DrawString(70,50, PointerData->MessagePVPower,WHITE,0);
 
 	  	  SSD1306_Display();
-	  	  i=i+1;
+
 	  	  printf("TASK OLED \n\r");
 
 	  //		printf("TASK OLED I2C MUTEX is released \n\r");
@@ -862,7 +1018,7 @@ void StartTaskPumpON(void *argument)
   for(;;)
   {
 
-	  osThreadFlagsWait(0x00000001U, osFlagsWaitAny, osWaitForever);
+	  osThreadFlagsWait(0x00000001U, osFlagsWaitAll, osWaitForever);
 
 	  drv8835_set_motorA_speed(99);
 	  osThreadFlagsClear(0x00000001U);
@@ -947,7 +1103,7 @@ void StartTaskAlarmCounter(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
+	  	  	  if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
 	 	 	  {
 	 	 	  	  _AlarmPeriod= _AlarmPeriod + 1;
 	 	 	  		if(_AlarmPeriod >=16)
@@ -990,119 +1146,129 @@ void StartTaskSdCard(void *argument)
 	uint8_t bytes;
 	char data[128];
 
-	Data_Structure_t _Data_StructureGet;
+	Data_Structure_t _Data_StructureGet = {0};
 	Data_Structure_t *PointerDataZ = &_Data_StructureGet;
 
 	uint32_t tick = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
-	  	  osMessageQueueGet(QueSDCARDHandle, PointerDataZ, 0, osWaitForever);
-
-//		  osMutexAcquire(TimerSDCardHandle, osWaitForever);
 
 
-			FatFsResult = f_mount(&SdFatFs, "", 1);
-			if(FatFsResult != FR_OK)
-			  {
-				  bytes = sprintf(data, "FatFS mount error.\n\r");
-				  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
-			  }
 
-			  else
-			  {
-				  bytes = sprintf(data, "FatFS mounted.\n\r");
-				  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+	  	  	 if (osOK == osMessageQueueGet(QueSDCARDHandle, PointerDataZ, 0, osWaitForever))
+	  	  	 {
 
-				  //
-				  // Open file on SD for writing
-				  //
-				  osMutexAcquire(MutexSdCardHandle, osWaitForever);
-				  FatFsResult = f_open(&SdCardFile, "badaniam.csv", FA_WRITE|FA_OPEN_APPEND);
 
-				  //
-				  // File open error check
-				  //
+				  FatFsResult = f_mount(&SdFatFs, "", 1);
 				  if(FatFsResult != FR_OK)
 				  {
-					  bytes = sprintf(data, "No badaniam.csv file. Can't create.\n\r");
+					  bytes = sprintf(data, "FatFS mount error.\n\r");
 					  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
 				  }
 
-
 				  else
 				  {
-
-					  bytes = sprintf(data, "File opened.\n\r");
+					  bytes = sprintf(data, "FatFS mounted.\n\r");
 					  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
 
 					  //
-					  //	Print something to this file
+					  // Open file on SD for writing
 					  //
-					  f_printf(&SdCardFile,PointerDataZ->MessageData);
-					  f_printf(&SdCardFile,PointerDataZ->MessageTime);
-					  f_printf(&SdCardFile, PointerDataZ->MessageTemp);
-					  f_printf(&SdCardFile,PointerDataZ->MessageHum);
-					  f_printf(&SdCardFile,PointerDataZ->MessageInten);
-					  f_printf(&SdCardFile,PointerDataZ->MessagePvVoltageBus);
-					  f_printf(&SdCardFile,PointerDataZ->MessagePVVoltageShunt);
-					  f_printf(&SdCardFile,PointerDataZ->MessagePVCurrent);
-					  f_printf(&SdCardFile,PointerDataZ->MessageTimePump);
-					  f_printf(&SdCardFile,PointerDataZ->MessageFreqAlarm);
-					  f_printf(&SdCardFile,"\n");
 
-
-
-
-		  //  		  for(uint8_t i = 0; i < 10; i++)
-		  //  		  {
-		  //  			  f_printf(&SdCardFile, "Line number %d;", i);
-		  //  		  }
+					  FatFsResult = f_open(&SdCardFile, "badania4.csv", FA_WRITE|FA_OPEN_APPEND);
 
 					  //
-					  // Close file
+					  // File open error check
 					  //
-					  FatFsResult = f_close(&SdCardFile);
-
-					  bytes = sprintf(data, "File closed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!.\n\r");
-					  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
-
-
-					 //
-							  // Open file on SD for reading
-							  //
-//					  FatFsResult = f_open(&SdCardFile, "badaniaFreertos.csv", FA_READ);
-//					  if(FatFsResult != FR_OK)
-//				  {
-//						  bytes = sprintf(data, "No badaniaFreertos.csv file. Can't create.\n\r");
-//						HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
-//				  }
-//					else
-//						{
-//						UINT len;
-//
-//							do
-//							{
-//								len=0;
-//								f_read(&SdCardFile, data,10,&len);
-//								HAL_UART_Transmit(&huart2, (uint8_t*)data, len, 1000);
-//							} while (len >0);
-//
-//						  FatFsResult = f_close(&SdCardFile);
-//						  bytes = sprintf(data, "File closed.\n\r");
-//						  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
-//						}
+					  if(FatFsResult != FR_OK)
+					  {
+						  bytes = sprintf(data, "No badaniam.csv file. Can't create.\n\r");
+						  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+					  }
 
 
+					  else
+					  {
+
+						  bytes = sprintf(data, "File opened.\n\r");
+						  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+
+						  //
+						  //	Print something to this file
+						  //
+						  f_printf(&SdCardFile,PointerDataZ->MessageData);
+						  f_printf(&SdCardFile,PointerDataZ->MessageTime);
+						  f_printf(&SdCardFile,PointerDataZ->MessageTemp);
+						  f_printf(&SdCardFile,PointerDataZ->MessageHum);
+						  f_printf(&SdCardFile,PointerDataZ->MessageInten);
+						  f_printf(&SdCardFile,PointerDataZ->MessageBatVoltageBus);
+						  f_printf(&SdCardFile,PointerDataZ->MessageBatVoltageShunt);
+						  f_printf(&SdCardFile,PointerDataZ->MessageBatCurrent);
+						  f_printf(&SdCardFile,PointerDataZ->MessageBatPower);
+						  f_printf(&SdCardFile,PointerDataZ->MessagePvVoltageBus);
+						  f_printf(&SdCardFile,PointerDataZ->MessagePVVoltageShunt);
+						  f_printf(&SdCardFile,PointerDataZ->MessagePVCurrent);
+						  f_printf(&SdCardFile,PointerDataZ->MessagePVPower);
+
+						  f_printf(&SdCardFile,PointerDataZ->MessageTimePump);
+						  f_printf(&SdCardFile,PointerDataZ->MessageFreqAlarm);
+						  f_printf(&SdCardFile,"\n");
 
 
 
-	      }
 
-				  osMutexRelease(MutexSdCardHandle);
+			  //  		  for(uint8_t i = 0; i < 10; i++)
+			  //  		  {
+			  //  			  f_printf(&SdCardFile, "Line number %d;", i);
+			  //  		  }
+
+						  //
+						  // Close file
+						  //
+						  FatFsResult = f_close(&SdCardFile);
+
+						  bytes = sprintf(data, "File closed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!.\n\r");
+						  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+
+
+						 //
+								  // Open file on SD for reading
+								  //
+	//					  FatFsResult = f_open(&SdCardFile, "badaniaFreertos.csv", FA_READ);
+	//					  if(FatFsResult != FR_OK)
+	//				  {
+	//						  bytes = sprintf(data, "No badaniaFreertos.csv file. Can't create.\n\r");
+	//						HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+	//				  }
+	//					else
+	//						{
+	//						UINT len;
+	//
+	//							do
+	//							{
+	//								len=0;
+	//								f_read(&SdCardFile, data,10,&len);
+	//								HAL_UART_Transmit(&huart2, (uint8_t*)data, len, 1000);
+	//							} while (len >0);
+	//
+	//						  FatFsResult = f_close(&SdCardFile);
+	//						  bytes = sprintf(data, "File closed.\n\r");
+	//						  HAL_UART_Transmit(&huart2, (uint8_t*)data, bytes, 1000);
+	//						}
+
+
+
+
+					  }
+				  	  }
+
+
 			  }
-//			 osMutexRelease(MutexSdCardHandle);
-			tick += (5000 * osKernelGetTickFreq()) / 1000;
+
+
+
+			tick += (150000 * osKernelGetTickFreq()) / 1000;
 				  	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskSdCard */
@@ -1119,22 +1285,27 @@ void StartTaskINA219(void *argument)
 {
   /* USER CODE BEGIN StartTaskINA219 */
 
-	INA219_t ina219;
+	INA219_t ina219_2;
 	ina219_calibration ina219_calibration;
 	ina219_calibration.ina219_calibrationValue = 4096;
 	ina219_calibration.ina219_currentDivider_mA = 10; // Current LSB = 100uA per bit (1000/100 = 10)
 	ina219_calibration.ina219_powerMultiplier_mW = 2; // Power LSB = 1mW per bit (2/1)
+//	ina219_calibration.ina219_calibrationValue = 8192;
+//		ina219_calibration.ina219_currentDivider_mA = 20; // Current LSB = 100uA per bit (1000/100 = 10)
+//		ina219_calibration.ina219_powerMultiplier_mW = 1.0f; // Power LSB = 1mW per bit (2/1)
 	INA219Data_t _ina219;
-	INA219Data_t *INA_219_pointer = &_ina219;
+	INA219Data_t *INA_219_pointer2 = &_ina219;
 
 
 
 
 
 	 osMutexAcquire(MutexI2CHandle, osWaitForever);
-	 INA219_Init(&ina219, &hi2c1, INA219_ADDRESS,&ina219_calibration);
+	 INA219_Init(&ina219_2, &hi2c1, INA219_ADDRESS_BAT,&ina219_calibration);
+	 INA219_setCalibration_32V_2A(&ina219_2,&ina219_calibration);
+
 	 osMutexRelease(MutexI2CHandle);
-	osTimerStart(TimerINA219Handle, 300);
+	osTimerStart(TimerINA219BatHandle, 450);
 	uint32_t tick = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -1143,24 +1314,141 @@ void StartTaskINA219(void *argument)
 
 	  	  osMutexAcquire(MutexI2CHandle, osWaitForever);
 	  	  printf("INA219 Mutex Acquire\n\r");
-		  INA_219_pointer->VoltageBus = INA219_ReadBusVoltage(&ina219);
-		  INA_219_pointer->VoltageShunt = INA219_ReadShuntVolage(&ina219);
-		  INA_219_pointer->Current = INA219_ReadCurrent(&ina219,&ina219_calibration);
-////
+		  INA_219_pointer2->VoltageBus = INA219_ReadBusVoltage(&ina219_2);
+		  INA_219_pointer2->VoltageShunt = INA219_ReadShuntVolage(&ina219_2);
+		  INA_219_pointer2->Current =  INA219_ReadCurrent(&ina219_2);
+		  INA_219_pointer2->Power = INA219_ReadPower(&ina219_2, &ina219_calibration);
+		 //
+
+//
 		  osMutexRelease(MutexI2CHandle);
 		  printf("INA219 Mutex Released\n\r");
 //
-		  if (osOK == osSemaphoreAcquire(BinarySemINA219Handle, 0)) {
-		  	 	  			osMessageQueuePut(QuequePVHandle, &_ina219, 0, osWaitForever);
+		  if (osOK == osSemaphoreAcquire(BinarySemIna219BatHandle, 0)) {
+		  	 	  			osMessageQueuePut(QuequeBatteryHandle, INA_219_pointer2, 0, osWaitForever);
 		  	 	  		}
 		  printf("INA219 exit \n\r");
 //
 
 
-	  tick+=(265*osKernelGetTickFreq())/1000;
+	  tick+=(365*osKernelGetTickFreq())/1000;
 	  osDelayUntil(tick);
   }
   /* USER CODE END StartTaskINA219 */
+}
+
+/* USER CODE BEGIN Header_StartTaskINA219PV */
+/**
+* @brief Function implementing the TaskINA219PV thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskINA219PV */
+void StartTaskINA219PV(void *argument)
+{
+  /* USER CODE BEGIN StartTaskINA219PV */
+
+	INA219_t ina219;
+	ina219_calibration ina219_calibration2;
+	ina219_calibration2.ina219_calibrationValue = 4096;
+	ina219_calibration2.ina219_currentDivider_mA = 10; // Current LSB = 100uA per bit (1000/100 = 10)
+	ina219_calibration2.ina219_powerMultiplier_mW = 2; // Power LSB = 1mW per bit (2/1)
+//	ina219_calibration.ina219_calibrationValue = 8192;
+//		ina219_calibration.ina219_currentDivider_mA = 20; // Current LSB = 100uA per bit (1000/100 = 10)
+//		ina219_calibration.ina219_powerMultiplier_mW = 1.0f; // Power LSB = 1mW per bit (2/1)
+	INA219Data_t _ina219_2;
+	INA219Data_t *INA_219_pointer_2 = &_ina219_2;
+
+
+
+
+
+	 osMutexAcquire(MutexI2CHandle, osWaitForever);
+	 INA219_Init(&ina219, &hi2c1, INA219_ADDRESS_PV,&ina219_calibration2);
+	 INA219_setCalibration_32V_2A(&ina219,&ina219_calibration2);
+
+	 osMutexRelease(MutexI2CHandle);
+	osTimerStart(TimerINA219Handle, 425);
+	uint32_t tick = osKernelGetTickCount();
+  /* Infinite loop */
+  for(;;)
+  {
+
+  	  osMutexAcquire(MutexI2CHandle, osWaitForever);
+  	  printf("INA219 Mutex Acquire\n\r");
+  	INA_219_pointer_2->VoltageBus = INA219_ReadBusVoltage(&ina219);
+  	INA_219_pointer_2->VoltageShunt = INA219_ReadShuntVolage(&ina219);
+  	INA_219_pointer_2->Current =  INA219_ReadCurrent(&ina219);
+  	INA_219_pointer_2->Power = INA219_ReadPower(&ina219, &ina219_calibration2);
+	 //
+
+//
+	  osMutexRelease(MutexI2CHandle);
+	  printf("INA219 Mutex Released\n\r");
+//
+	  if (osOK == osSemaphoreAcquire(BinarySemINA219Handle, 0)) {
+	  	 	  			osMessageQueuePut(QueuePVHandle, INA_219_pointer_2, 0, osWaitForever);
+	  	 	  		}
+	  printf("INA219 exit \n\r");
+//
+
+	  tick+=(325*osKernelGetTickFreq())/1000;
+	  osDelayUntil(tick);
+  }
+  /* USER CODE END StartTaskINA219PV */
+}
+
+/* USER CODE BEGIN Header_StartTaskDS3231 */
+/**
+* @brief Function implementing the TaskDS3231 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskDS3231 */
+void StartTaskDS3231(void *argument)
+{
+  /* USER CODE BEGIN StartTaskDS3231 */
+
+			Ds3231_t _Ds3231;
+
+			RTC_TimeTypeDef _RTCTime1 = {0};
+			RTC_DateTypeDef _RTCDate1 = {0};
+
+
+
+			DS3231_Init(&hi2c1);
+	//	  DS3231_SetRateSelect(DS3231_1HZ);
+
+
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  	  	  osThreadFlagsWait(0x00000100U, osFlagsWaitAll, osWaitForever);
+
+	 	  	  osMutexAcquire(MutexI2CHandle, osWaitForever);
+	 	  	 _RTCDate1.Year = DS3231_GetYear() -2000;
+	 		 _RTCDate1.Month = DS3231_GetMonth();
+	 		 _RTCDate1.Date = DS3231_GetDate();
+
+	 	  	  _RTCTime1.Hours = DS3231_GetHour();
+	 	  	  _RTCTime1.Minutes = DS3231_GetMinute();
+	 	  	  _RTCTime1.Seconds =  DS3231_GetSecond();
+
+
+
+	 		  osMutexRelease(MutexI2CHandle);
+
+
+	 		  osMessageQueuePut(QueDs3231TimeHandle, &_RTCTime1, 0, osWaitForever);
+	 		  osMessageQueuePut(QueueDs3231DateHandle, &_RTCDate1, 0, osWaitForever);
+
+	 		  printf(" Date: %d: %d: %d\n\r", _RTCDate1.Year, _RTCDate1.Month, _RTCDate1.Date );
+	 		  printf(" time: %d: %d: %d\n\r", _RTCTime1.Hours, _RTCTime1.Minutes, _RTCTime1.Seconds );
+	 //		  osThreadFlagsClear(0x00000100U);
+	 		  osThreadFlagsClear(0x00000100U);
+  }
+  /* USER CODE END StartTaskDS3231 */
 }
 
 /* CallbackTimerBmeData function */
@@ -1203,6 +1491,14 @@ void CallbackTimerINA219(void *argument)
   /* USER CODE END CallbackTimerINA219 */
 }
 
+/* CallbackTimerINA219Bat function */
+void CallbackTimerINA219Bat(void *argument)
+{
+  /* USER CODE BEGIN CallbackTimerINA219Bat */
+	osSemaphoreRelease(BinarySemIna219BatHandle);
+  /* USER CODE END CallbackTimerINA219Bat */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
@@ -1241,7 +1537,8 @@ void CallbackTimerINA219(void *argument)
 //	}
 //}
 
-void _putchar(char character) {
+void _putchar(char character)
+{
 	// send char to console etc.
 	osMutexAcquire(MutexPrintfHandle, osWaitForever);
 	HAL_UART_Transmit(&huart2, (uint8_t*)&character, 1, 1000);

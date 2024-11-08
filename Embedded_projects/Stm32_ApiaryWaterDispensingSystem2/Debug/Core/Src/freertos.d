@@ -53,16 +53,18 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/printf.h ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Core/Inc/gpio.h ../Core/Inc/i2c.h ../Core/Inc/spi.h ../Core/Inc/rtc.h \
  ../Core/Inc/bme280.h ../Core/Inc/tim.h ../Core/Inc/SSD1306_OLED.h \
- ../Core/Inc/drv8835.h ../Core/Inc/INA219.h ../Core/Inc/bh1750.h \
+ ../Core/Inc/drv8835.h ../Core/Inc/INA219.h ../Core/Inc/ds3231.h \
+ ../Core/Inc/ds3231.h ../Core/Inc/bh1750.h \
  ../Middlewares/Third_Party/FatFs/src/ff.h \
  ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
+ ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
+ ../Middlewares/Third_Party/FatFs/src/diskio.h \
+ ../Middlewares/Third_Party/FatFs/src/ff.h \
  ../FATFS/Target/user_diskio_spi.h \
  ../Middlewares/Third_Party/FatFs/src/integer.h \
  ../Middlewares/Third_Party/FatFs/src/diskio.h \
- ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
- ../Middlewares/Third_Party/FatFs/src/diskio.h \
- ../Middlewares/Third_Party/FatFs/src/ff.h ../FATFS/Target/user_diskio.h \
- ../Core/Inc/GFX_BW.h ../Core/Inc/fonts/font_8x5.h
+ ../FATFS/Target/user_diskio.h ../Core/Inc/GFX_BW.h \
+ ../Core/Inc/fonts/font_8x5.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -127,16 +129,18 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/SSD1306_OLED.h:
 ../Core/Inc/drv8835.h:
 ../Core/Inc/INA219.h:
+../Core/Inc/ds3231.h:
+../Core/Inc/ds3231.h:
 ../Core/Inc/bh1750.h:
 ../Middlewares/Third_Party/FatFs/src/ff.h:
 ../Middlewares/Third_Party/FatFs/src/integer.h:
 ../FATFS/Target/ffconf.h:
-../FATFS/Target/user_diskio_spi.h:
-../Middlewares/Third_Party/FatFs/src/integer.h:
-../Middlewares/Third_Party/FatFs/src/diskio.h:
 ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
 ../Middlewares/Third_Party/FatFs/src/diskio.h:
 ../Middlewares/Third_Party/FatFs/src/ff.h:
+../FATFS/Target/user_diskio_spi.h:
+../Middlewares/Third_Party/FatFs/src/integer.h:
+../Middlewares/Third_Party/FatFs/src/diskio.h:
 ../FATFS/Target/user_diskio.h:
 ../Core/Inc/GFX_BW.h:
 ../Core/Inc/fonts/font_8x5.h:
