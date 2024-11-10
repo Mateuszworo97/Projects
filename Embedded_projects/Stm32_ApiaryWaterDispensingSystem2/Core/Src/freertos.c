@@ -628,6 +628,8 @@ void StartTaskRTC(void *argument)
 
 		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
 		osMessageQueuePut(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
+
+
 	 	osTimerStart(TimerRTCHandle, 300);
 	 	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
