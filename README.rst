@@ -15,7 +15,10 @@ Operation
 ------------
 
 
-The system measures time, temperature, humidity and light intensity. The data is shown on the display.
+The system measures time, temperature, humidity, light intensity, battery voltage, 
+value and direction of battery current flow, power consumered and delivered to battery,
+Voltage of photovoltaic panel, value of photovoltaic panel.
+The data is shown on the display.
 By default, the pump is turned on for 1 minute. Every hour.
 Using push buttons, we can increase the pump activation time from 1 to 59 minutes.
 Using the buttons, we can also change the time at which the alarm will turn on (pump on).
@@ -24,6 +27,15 @@ we can delay the pump activation value from 1 to 16.
 
 
 
+
+Development
+Creating
+------------
+
+1.
+2.
+3.
+4.
 
 
 Components
