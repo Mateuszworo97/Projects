@@ -29,13 +29,14 @@ we can delay the pump activation value from 1 to 16.
 
 
 Development
-Creating
 ------------
 
-1.
-2.
-3.
-4.
+
+1. Simplification 
+2. Adding an automatic and manual control system
+3. Enriching the project with wireless data transmission using  LORAWAN technology
+4. Desiging a much smaller PCB
+5. Creating own MPPT board
 
 
 Components
