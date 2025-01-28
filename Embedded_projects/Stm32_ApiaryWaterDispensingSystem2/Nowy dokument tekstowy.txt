@@ -1,5 +1,0 @@
-Binary/
-*.html
-.settings
-.cproject
-.project
