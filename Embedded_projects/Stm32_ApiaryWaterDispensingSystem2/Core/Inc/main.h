@@ -75,6 +75,8 @@ void Error_Handler(void);
 #define MODE_GPIO_Port GPIOA
 #define B3_Pin GPIO_PIN_0
 #define B3_GPIO_Port GPIOB
+#define SD_CS_Pin GPIO_PIN_10
+#define SD_CS_GPIO_Port GPIOB
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
