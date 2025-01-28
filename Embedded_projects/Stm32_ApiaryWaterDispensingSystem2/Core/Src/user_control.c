@@ -6,3 +6,14 @@
  */
 
 
+#include "user_control.h"
+
+
+enum Pump_Button
+{
+	RC_BUTTON_UP,
+	RC_BUTTON_DOWN,
+	RC_BUTTON_ACTIVATED,
+	RC_BUTTON_OPTION,
+
+};
