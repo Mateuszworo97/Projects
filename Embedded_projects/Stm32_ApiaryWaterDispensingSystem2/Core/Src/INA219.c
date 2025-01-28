@@ -14,7 +14,9 @@ uint16_t Read16(INA219_t *ina219, uint8_t Register)
 {
 	uint8_t Value[2];
 
-	HAL_I2C_Mem_Read(ina219->ina219_i2c, (INA219_ADDRESS<<1), Register, 1, Value, 2, 1000);
+
+
+	HAL_I2C_Mem_Read(ina219->ina219_i2c, (ina219->Address<<1), Register, 1, Value, 2, 1000);
 
 	return ((Value[0] << 8) | Value[1]);
 }
@@ -25,9 +27,10 @@ void Write16(INA219_t *ina219, uint8_t Register, uint16_t Value)
 	uint8_t addr[2];
 	addr[0] = (Value >> 8) & 0xff;  // upper byte
 	addr[1] = (Value >> 0) & 0xff; // lower byte
-	HAL_I2C_Mem_Write(ina219->ina219_i2c, (INA219_ADDRESS<<1), Register, 1, (uint8_t*)addr, 2, 1000);
-}
 
+	HAL_I2C_Mem_Write(ina219->ina219_i2c, (ina219->Address<<1), Register, 1, (uint8_t*)addr, 2, 1000);
+
+}
 uint16_t INA219_ReadBusVoltage(INA219_t *ina219)
 {
 	uint16_t result = Read16(ina219, INA219_REG_BUSVOLTAGE);
@@ -43,11 +46,17 @@ int16_t INA219_ReadCurrent_raw(INA219_t *ina219)
 	return (result );
 }
 
-int16_t INA219_ReadCurrent(INA219_t *ina219,ina219_calibration *ina219calibration)
+float INA219_ReadCurrent(INA219_t *ina219)
 {
 	int16_t result = INA219_ReadCurrent_raw(ina219);
 
-	return (result / ina219calibration->ina219_currentDivider_mA );
+	return (result / 10);
+}
+uint16_t INA219_ReadPower(INA219_t *ina219,ina219_calibration *ina219calibration)
+{
+	uint16_t result = Read16(ina219, INA219_REG_POWER );
+	result = result * (ina219calibration->ina219_powerMultiplier_mW); // power is the power register times the power_LSB (power multiplier)
+	return (result);
 }
 
 uint16_t INA219_ReadShuntVolage(INA219_t *ina219)

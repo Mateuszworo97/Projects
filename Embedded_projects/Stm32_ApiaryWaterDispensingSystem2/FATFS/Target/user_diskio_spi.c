@@ -27,6 +27,8 @@
 #include "main.h" /* Provide the low-level HAL functions */
 
 #include "user_diskio_spi.h"
+#include "stm32f4xx_hal_spi.h"
+#include "spi.h"
 
 //If you want to use a different SPI port change hspi1 here and elsewhere in this file
 extern SPI_HandleTypeDef hspi3;

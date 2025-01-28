@@ -9,8 +9,8 @@
 #define INC_INA219_H_
 
 
-#define INA219_ADDRESS 							(0x40)
-
+#define INA219_ADDRESS_BAT						(0x40)
+#define INA219_ADDRESS_PV 						(0x41)
 //
 //	Registers
 //
@@ -70,6 +70,7 @@ typedef struct
 	uint16_t ina219_calibrationValue ;
 	int16_t ina219_currentDivider_mA ;
 	int16_t ina219_powerMultiplier_mW ;
+
 }ina219_calibration;
 
 
@@ -80,26 +81,30 @@ typedef struct
 } INA219_t;
 
 
-
+uint16_t Read16(INA219_t *ina219, uint8_t Register);
+void Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
+void INA219_setCalibration_32V_2A(INA219_t *ina219,ina219_calibration *ina219calibration);
+void INA219_setCalibration_32V_1A(INA219_t *ina219,ina219_calibration *ina219calibration);
+void INA219_setCalibration_16V_400mA(INA219_t *ina219,ina219_calibration *ina219calibration);
+void INA219_Reset(INA219_t *ina219);
+void INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
+void INA219_setPowerMode(INA219_t *ina219, uint8_t Mode);
+uint16_t INA219_getConfig(INA219_t *ina219);
+void INA219_setConfig(INA219_t *ina219, uint16_t Config);
 
 
 uint8_t INA219_Init(INA219_t *ina219, I2C_HandleTypeDef *i2c, uint8_t Address,ina219_calibration *ina219calibration);
 uint16_t INA219_ReadBusVoltage(INA219_t *ina219);
-int16_t INA219_ReadCurrent(INA219_t *ina219,ina219_calibration *ina219calibration);
+float INA219_ReadCurrent(INA219_t *ina219);
 int16_t INA219_ReadCurrent_raw(INA219_t *ina219);
 uint16_t INA219_ReadShuntVolage(INA219_t *ina219);
+uint16_t INA219_ReadPower(INA219_t *ina219,ina219_calibration *ina219calibration);
 
-void INA219_Reset(INA219_t *ina219);
-void INA219_setCalibration(INA219_t *ina219, uint16_t CalibrationData);
-uint16_t INA219_getConfig(INA219_t *ina219);
-void INA219_setConfig(INA219_t *ina219, uint16_t Config);
-void INA219_setCalibration_32V_2A(INA219_t *ina219,ina219_calibration *ina219calibration);
-void INA219_setCalibration_32V_1A(INA219_t *ina219,ina219_calibration *ina219calibration);
-void INA219_setCalibration_16V_400mA(INA219_t *ina219,ina219_calibration *ina219calibration);
-void INA219_setPowerMode(INA219_t *ina219, uint8_t Mode);
 
-uint16_t Read16(INA219_t *ina219, uint8_t Register);
-void Write16(INA219_t *ina219, uint8_t Register, uint16_t Value);
+
+
+
+
 
 
 #endif /* INC_INA219_H_ */
