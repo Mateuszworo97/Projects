@@ -1,0 +1,10 @@
+Binary/
+/Debug/
+*.html
+*.log
+*.xml
+*.chm
+_htmresc
+.settings
+.cproject*
+.project*
