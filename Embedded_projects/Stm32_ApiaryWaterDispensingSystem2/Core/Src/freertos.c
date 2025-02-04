@@ -56,6 +56,7 @@
 #include "ds3231.h"
 
 #include "bh1750.h"
+#include "button.h"
 #include "ff.h"
 #include "ff_gen_drv.h"
 #include "user_diskio_spi.h"

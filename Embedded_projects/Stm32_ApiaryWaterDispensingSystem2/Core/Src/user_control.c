@@ -7,13 +7,23 @@
 
 
 #include "user_control.h"
+#include <stdio.h>
+#include <stdint.h>
 
-
-enum Pump_Button
+void process_flags(uint8_t *flags)
 {
-	RC_BUTTON_UP,
-	RC_BUTTON_DOWN,
-	RC_BUTTON_ACTIVATED,
-	RC_BUTTON_OPTION,
+    int32_t i = 0;
 
-};
+    for (i = 0; i < FLAG_MAPPER_SIZE; i++)
+    {
+        size_t idx = flag_mapper[i].idx;
+        uint32_t mask = flag_mapper[i].mask;
+        if (flags[idx] & mask)
+        {
+            flag_mapper[i].trigger();
+        }
+    }
+}
+
+//mapping
+
