@@ -379,6 +379,7 @@ const osSemaphoreAttr_t BinarySemIna219Bat_attributes = {
 /* USER CODE BEGIN FunctionPrototypes */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void _putchar(char character);
+uint8_t Function_AlarmPeriod(uint8_t AlarmPeriod);
 /* USER CODE END FunctionPrototypes */
 
 void StartTaskRTC(void *argument);
@@ -1100,30 +1101,53 @@ void StartTaskAlarmCounter(void *argument)
 {
   /* USER CODE BEGIN StartTaskAlarmCounter */
 	static uint8_t _AlarmPeriod = 1;
+	 CONFIG_MANAGER config = {
+	        .CurrentConfig = CONFIG_PUMP_TIME,
+	        .PumpTime = 1,
+	        .AlarmFreq = 1,
+	        .TempValue = 1,
+	        .AcceptedValue = 1
+	    };
+	CONFIG_MANAGER Config;
+	TBUTTON UpButton,DownButton,Activated,Option;
+	ButtonInitKey (&UpButton,&config,UP,B1_GPIO_Port,B1_Pin,200,500,700);
+
+	ButtonInitKey (&DownButton,&config,DOWN,B2_GPIO_Port,B2_Pin,200,500,700);
+	ButtonInitKey (&Activated,&config,ACTIVATED,B3_GPIO_Port,B3_Pin,200,500,700);
+	ButtonInitKey (&UpButton,&config,OPTION,B4_GPIO_Port,B4_Pin,200,500,700);
+
+
+
+
+
 	uint32_t tick = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
   {
-	  	  	  if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
-	 	 	  {
-	 	 	  	  _AlarmPeriod= _AlarmPeriod + 1;
-	 	 	  		if(_AlarmPeriod >=16)
-	 	 	  		{
-	 	 	  			_AlarmPeriod = 1;
-	 	 	  		}
-	 	 	  		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
-	 	 	  }
-	 	 	  else if(HAL_GPIO_ReadPin(B4_GPIO_Port, B4_Pin)== GPIO_PIN_RESET)
-	 	 	  {
-	 	 		  _AlarmPeriod= _AlarmPeriod - 1;
-	 	 		 	  		if(_AlarmPeriod <=0)
-	 	 		 	  		{
-	 	 		 	  			_AlarmPeriod = 16;
-	 	 		 	  		}
-	 	 		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
-	 	 	  }
+	  ButtonTask(&UpButton,&config);
+	  ButtonTask(&DownButton,&config);
+	  ButtonTask(&Activated,&config);
+	  ButtonTask(&Option,&config);
+//	  	  	  if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
+//	 	 	  {
+//	 	 	  	  _AlarmPeriod= _AlarmPeriod + 1;
+//	 	 	  		if(_AlarmPeriod >=16)
+//	 	 	  		{
+//	 	 	  			_AlarmPeriod = 1;
+//	 	 	  		}
+//	 	 	  		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
+//	 	 	  }
+//	 	 	  else if(HAL_GPIO_ReadPin(B4_GPIO_Port, B4_Pin)== GPIO_PIN_RESET)
+//	 	 	  {
+//	 	 		  _AlarmPeriod= _AlarmPeriod - 1;
+//	 	 		 	  		if(_AlarmPeriod <=0)
+//	 	 		 	  		{
+//	 	 		 	  			_AlarmPeriod = 16;
+//	 	 		 	  		}
+//	 	 		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
+//	 	 	  }
 
-	 	 	  	  	tick += (200 * osKernelGetTickFreq()) / 1000;
+	 	 	  	  	tick += (500 * osKernelGetTickFreq()) / 1000;
 	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskAlarmCounter */
@@ -1546,6 +1570,7 @@ void _putchar(char character)
 
 	osMutexRelease(MutexPrintfHandle);
 }
+
 
 /* USER CODE END Application */
 

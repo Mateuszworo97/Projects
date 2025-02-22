@@ -9,14 +9,37 @@
 #include "button.h"
 #include "cmsis_os2.h"
 
-void ButtonInitKey (TBUTTON *key,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat)
+void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat)
 {
 	key->State = IDLE;
+	key->Type = Type;
 	key->GpioPort = GpioPort;
 	key->GpioPin = GpioPin;
 	key->TimerDebounce = TimerDebounce;
 	key->TimerLongPress = TimerLongPress;
 	key->TimerRepeat = TimerRepeat;
+
+
+	 // Przypisanie domyślnych wskaźników do funkcji
+	    switch (Type)
+	    {
+	    	case OPTION:
+	               key->ButtonPressed = ButtonOptionPressed;
+	               break;
+	           case ACTIVATED:
+	        	   key->ButtonPressed = ButtonActivatedPressed;
+	               break;
+	           case UP:
+	        	   key->ButtonPressed = ButtonUpPressed;
+	               break;
+	           case DOWN:
+	        	   key->ButtonPressed = ButtonDownPressed;
+	               break;
+	           default:
+	        	   key->ButtonPressed = NULL;
+	               break;
+	    }
+
 }
 //time setting functions
 void ButtonSetDebounceTime(TBUTTON *key,uint32_t Miliseconds)
@@ -44,7 +67,7 @@ void ButtonIdleRoute(TBUTTON * key)
 			key->LastTick = osKernelGetTickCount();
 		}
 	}
-void ButtonDebounceRoute(TBUTTON * key)
+void ButtonDebounceRoute(TBUTTON * key,CONFIG_MANAGER *konfiguracja)
 	{
 		if ((osKernelGetTickCount() - key->LastTick) > key ->TimerDebounce)
 		{
@@ -54,7 +77,8 @@ void ButtonDebounceRoute(TBUTTON * key)
 				key->LastTick = osKernelGetTickCount();
 				if (key->ButtonPressed != 0)
 				{
-					key->ButtonPressed;
+					key->ButtonPressed(konfiguracja);
+
 				}
 			}
 		}
@@ -64,7 +88,7 @@ void ButtonDebounceRoute(TBUTTON * key)
 		}
 
 	}
-void ButtonPressedRoute(TBUTTON * key)
+void ButtonPressedRoute(TBUTTON * key,CONFIG_MANAGER *config)
 	{
 		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
 		{
@@ -78,12 +102,12 @@ void ButtonPressedRoute(TBUTTON * key)
 				key->LastTick = osKernelGetTickCount();
 				if (key->ButtonLongPressed != 0)
 					{
-						key->ButtonLongPressed;
+						key->ButtonLongPressed(config);
 					}
 			}
 		}
 	}
-void ButtonRepeatRoute(TBUTTON * key)
+void ButtonRepeatRoute(TBUTTON * key,CONFIG_MANAGER *config)
 	{
 		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
 				{
@@ -97,14 +121,82 @@ void ButtonRepeatRoute(TBUTTON * key)
 				if (key->ButtonRepeat != 0)
 					{
 
-						key->ButtonRepeat;
+						key->ButtonRepeat(config);
 
 					}
 			}
 		}
 	}
+
+
+void ButtonUpPressed(CONFIG_MANAGER *config)
+{
+		if (config->CurrentConfig == CONFIG_PUMP_TIME && config->TempValue < 60)
+			{
+				config->TempValue++;
+			}
+	    else if (config->CurrentConfig == CONFIG_ALARM_FREQ && config->TempValue < 24)
+			{
+				config->TempValue++;
+			}
+	}
+
+// DOWN - Zmniejsza wartość w aktualnym trybie konfiguracji
+void ButtonDownPressed(CONFIG_MANAGER *config)
+{
+	  if (config->CurrentConfig == CONFIG_PUMP_TIME && config->TempValue > 1)
+	    {
+	        config->TempValue--;
+	    }
+	    else if (config->CurrentConfig == CONFIG_ALARM_FREQ && config->TempValue > 1)
+	    {
+	        config->TempValue--;
+	    }
+}
+
+
+void ButtonOptionPressed(CONFIG_MANAGER *config)
+{
+
+    config->CurrentConfig++;
+    if (config->CurrentConfig >= CONFIG_TYPE_COUNT)
+    {
+        config->CurrentConfig = CONFIG_PUMP_TIME;
+    }
+
+    // Po zmianie opcji przywracamy niezatwierdzoną wartość
+    switch (config->CurrentConfig)
+    {
+        case CONFIG_PUMP_TIME:
+            config->TempValue = config->PumpTime;
+            break;
+        case CONFIG_ALARM_FREQ:
+            config->TempValue = config->AlarmFreq;
+            break;
+
+    }
+}
+
+// ACTIVATED - Zatwierdza zmianę i zapisuje wartość
+
+void ButtonActivatedPressed(CONFIG_MANAGER *config)
+{
+	switch (config->CurrentConfig)
+	    {
+	        case CONFIG_PUMP_TIME:
+	            config->PumpTime = config->TempValue;
+	            break;
+	        case CONFIG_ALARM_FREQ:
+	            config->AlarmFreq = config->TempValue;
+	            break;
+	    }
+}
+
+
+
+
 //State machine
-void ButtonTask(TBUTTON * key)
+void ButtonTask(TBUTTON * key,CONFIG_MANAGER *config)
 {
 	switch(key->State)
 	{
@@ -112,14 +204,14 @@ void ButtonTask(TBUTTON * key)
 			ButtonIdleRoute(key);
 			break;
 		case DEBOUNCE:
-			ButtonDebounceRoute(key);
+			ButtonDebounceRoute(key,config);
 			break;
 
 		case PRESSED:
-			ButtonPressedRoute(key);
+			ButtonPressedRoute(key,config);
 			break;
 		case REPEAT:
-			ButtonRepeatRoute( key);
+			ButtonRepeatRoute( key,config);
 			break;
 	}
 }
