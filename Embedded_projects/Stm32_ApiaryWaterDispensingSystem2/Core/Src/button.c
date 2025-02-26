@@ -9,6 +9,8 @@
 #include "button.h"
 #include "cmsis_os2.h"
 
+extern osMessageQueueId_t QueueCounterPumpHandle;
+
 void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat)
 {
 	key->State = IDLE;
@@ -67,7 +69,7 @@ void ButtonIdleRoute(TBUTTON * key)
 			key->LastTick = osKernelGetTickCount();
 		}
 	}
-void ButtonDebounceRoute(TBUTTON * key,CONFIG_MANAGER *konfiguracja)
+void ButtonDebounceRoute(TBUTTON * key, CONFIG_MANAGER *config)
 	{
 		if ((osKernelGetTickCount() - key->LastTick) > key ->TimerDebounce)
 		{
@@ -77,7 +79,8 @@ void ButtonDebounceRoute(TBUTTON * key,CONFIG_MANAGER *konfiguracja)
 				key->LastTick = osKernelGetTickCount();
 				if (key->ButtonPressed != 0)
 				{
-					key->ButtonPressed(konfiguracja);
+					key->ButtonPressed(config);
+					osMessageQueuePut(QueueCounterPumpHandle, &config , 0, 50);
 
 				}
 			}
@@ -133,24 +136,36 @@ void ButtonUpPressed(CONFIG_MANAGER *config)
 {
 		if (config->CurrentConfig == CONFIG_PUMP_TIME && config->TempValue < 60)
 			{
+			if (config->TempValue < 60)
 				config->TempValue++;
+			else
+				config->TempValue = 1;
 			}
 	    else if (config->CurrentConfig == CONFIG_ALARM_FREQ && config->TempValue < 24)
 			{
-				config->TempValue++;
+	    		if(config->TempValue < 24)
+	    			config->TempValue++;
+	    		else
+	    			config->TempValue = 1;
 			}
 	}
 
 // DOWN - Zmniejsza wartość w aktualnym trybie konfiguracji
 void ButtonDownPressed(CONFIG_MANAGER *config)
 {
-	  if (config->CurrentConfig == CONFIG_PUMP_TIME && config->TempValue > 1)
+	  if (config->CurrentConfig == CONFIG_PUMP_TIME )
 	    {
-	        config->TempValue--;
+		  if (config->TempValue > 1)
+	          config->TempValue--;
+		  else
+			  config->TempValue=59;
 	    }
-	    else if (config->CurrentConfig == CONFIG_ALARM_FREQ && config->TempValue > 1)
+	    else if (config->CurrentConfig == CONFIG_ALARM_FREQ )
 	    {
-	        config->TempValue--;
+	    	if (config->TempValue > 1)
+	    		config->TempValue--;
+	    	else
+	    		config ->TempValue = 23;
 	    }
 }
 

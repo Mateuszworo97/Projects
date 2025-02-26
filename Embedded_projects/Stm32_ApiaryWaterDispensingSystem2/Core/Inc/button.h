@@ -40,12 +40,12 @@ typedef enum
 
 typedef struct
 {
-		CONFIG_TYPE CurrentConfig;  // Aktualnie edytowana opcja
-	    uint8_t PumpTime;           // Ustawiona wartość czasu pompowania
-	    uint8_t AlarmFreq;          // Ustawiona wartość częstotliwości alarmu
+		CONFIG_TYPE CurrentConfig ;  // Aktualnie edytowana opcja
+	     uint8_t PumpTime  ;           // Ustawiona wartość czasu pompowania
+	     uint8_t AlarmFreq ;          // Ustawiona wartość częstotliwości alarmu
 
-	    uint8_t TempValue;          // Tymczasowa wartość edytowanej opcji
-	    uint8_t AcceptedValue;      // Zatwierdzona wartość
+	     uint8_t TempValue ;          // Tymczasowa wartość edytowanej opcji
+	     uint8_t AcceptedValue ;      // Zatwierdzona wartość
 
 }CONFIG_MANAGER;
 typedef enum

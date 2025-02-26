@@ -21,7 +21,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -48,8 +48,10 @@
 #include "i2c.h"
 #include "spi.h"
 #include "rtc.h"
-#include "bme280.h"
+
 #include "tim.h"
+#include "bme280.h"
+#include "measurements.h"
 #include "SSD1306_OLED.h"
 #include "drv8835.h"
 #include "INA219.h"
@@ -83,50 +85,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-typedef struct {
-		uint8_t Hour;
-		uint8_t Minutes;
-		uint8_t Seconds;
-		uint8_t Day;
-		uint8_t Month;
-		uint16_t Year;
-}Ds3231_t;
-typedef struct {
-	float Humidity;
-	float Temperature;
-	int32_t Pressure;
-} BmeData_t;
 
-typedef struct{
-	uint16_t VoltageBus;
-	uint16_t VoltageShunt;
-	uint16_t Power;
-	int16_t Current;
-
-}INA219Data_t;
-
-typedef struct {
-	char MessageTemp[32];
-	char MessageHum[32];
-    char MessageInten[32];
-    char MessageTime[32];
-    char MessageData[32];
-	char MessageTimePump[32];
-	char MessagePvVoltageBus[32];
-	char MessagePVVoltageShunt[32];
-	char MessagePVCurrent[32];
-	char MessagePVPower[32];
-	char MessageBatVoltageBus[32];
-	char MessageBatVoltageShunt[32];
-	char MessageBatCurrent[32];
-	char MessageBatPower[32];
-	char MessageFreqAlarm[32];
-
-}Data_Structure_t;
-typedef struct {
-	float LightIntensity;
-
-} BHData_t;
 
 
 /* USER CODE END Variables */
@@ -377,9 +336,9 @@ const osSemaphoreAttr_t BinarySemIna219Bat_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+
 void _putchar(char character);
-uint8_t Function_AlarmPeriod(uint8_t AlarmPeriod);
+
 /* USER CODE END FunctionPrototypes */
 
 void StartTaskRTC(void *argument);
@@ -586,6 +545,7 @@ void StartTaskRTC(void *argument)
 {
   /* USER CODE BEGIN StartTaskRTC */
 		extern RTC_HandleTypeDef hrtc;
+		static  CONFIG_MANAGER config;
 
 	 	 RTC_TimeTypeDef _RTCTime ={0};
 
@@ -642,7 +602,7 @@ void StartTaskRTC(void *argument)
 	      if(osOK== osMessageQueueGet(QueDs3231TimeHandle, &_RTCTime, 0, 50))
 	      {
 	    	  HAL_RTC_SetTime(&hrtc,&_RTCTime, RTC_FORMAT_BIN);
-	    	  if (_RTCTime.Hours +1 <=22)
+	    	  if (_RTCTime.Hours  <=22)
 				  {  	  _AlarmON.AlarmTime.Hours = _RTCTime.Hours + 1  ;
 						 _AlarmON.AlarmTime.Minutes = 0;
 						_AlarmON.AlarmTime.Seconds = 0 ;
@@ -870,23 +830,14 @@ void StartTaskSSD1306(void *argument)
 {
   /* USER CODE BEGIN StartTaskSSD1306 */
 	Data_Structure_t _DataStructure;
-	Data_Structure_t *PointerData =&_DataStructure;
+
+	static CONFIG_MANAGER config;
+	SensorData_t _sensorData;
 
 
 
-	BmeData_t _BmeData;
-	BHData_t _BHData;
-	INA219Data_t _INA219_Battery ={0};
-	INA219Data_t _INA219_PV ={0};
-
-	RTC_TimeTypeDef _RTCTime2 = {0};
-	 _RTCTime2.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-	 	 _RTCTime2.StoreOperation = RTC_STOREOPERATION_RESET;
-	RTC_DateTypeDef _RTCData2 = {0};
-	uint8_t _AlarmPeriod = 1;
-
-	uint8_t _PumpDispensing = 1;
-
+	_sensorData.RTCTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	_sensorData.RTCTime.StoreOperation = RTC_STOREOPERATION_RESET;
 
 	uint32_t tick2;
 
@@ -907,92 +858,9 @@ void StartTaskSSD1306(void *argument)
   for(;;)
   {
 	  	  SSD1306_Clear(BLACK);
-	  	  osMessageQueueGet(QueueBmeHandle, &_BmeData, 0, 50);
-	  	  printf("1\n\r");
-	  	  osMessageQueueGet(QueueBh1750Handle, &_BHData, 0, 50);
-	  	  printf("2\n\r");
-	  //	  osMessageQueueGet(QueueRTCDataHandle, &_RTCDate, 0,osWaitForever);
 
-
-	  	  osMessageQueueGet(QuequeBatteryHandle, &_INA219_Battery, 0, 50);
-	      printf("3\n\r");
-	      osMessageQueueGet(QueuePVHandle, &_INA219_PV, 0, 100);
-	    	  	  printf("4\n\r");
-	  	  if (osOK == osMessageQueueGet(QueueRTCTimeHandle, &_RTCTime2, 0, 50))
-	  	  {
-
-
-	  		  printf("5\n\r");
-	  	  }
-
-	  	  if(osOK == osMessageQueueGet(QueueRTCDataHandle, &_RTCData2, 0, 50))
-	  	  {
-
-
-	  		  printf("6\n\r");
-	  	  }
-
-
-
-
-	  	  if(osOK== osMessageQueueGet(QueueCounterPumpHandle, &_PumpDispensing, 0, 50))
-	  	  {
-
-	  		  osMessageQueuePut(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
-	  		  osSemaphoreRelease(BinarySemCounterHandle);
-	  	  }
-
-	  	  else 	if(osOK== osMessageQueueGet(QueueCounterAlarmHandle, &_AlarmPeriod, 0, 50))
-	  	 {
-
-	  		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
-	  		   osSemaphoreRelease(BinarySemSetAlarmHandle);
-
-	  	 }
-
-
-//	  	   osMessageQueueGet(QueueCounterAlarmHandle, &_AlarmPeriod, 0, 50);
-
-
-//	  	   osMessageQueuePut(QueueCounterPumpHandle, &_PumpOperatingTime, 0, osWaitForever);
-	  	  sprintf(PointerData->MessageData, "Data: %02d.%02d.%02d;",_RTCData2.Date,_RTCData2.Month,_RTCData2.Year);
-	      sprintf(PointerData->MessageTime, "%02d:%02d:%02d;",_RTCTime2.Hours,_RTCTime2.Minutes,_RTCTime2.Seconds);
-	  	  sprintf(PointerData->MessageTemp, "T:%.2f C; ", _BmeData.Temperature);
-	  	  sprintf(PointerData->MessageHum, "%.2f %;", _BmeData.Humidity);
-	  	  sprintf(PointerData->MessageInten, "%.2f lx;", _BHData.LightIntensity);
-	  	  sprintf(PointerData->MessageBatVoltageBus,"B:%u mV;", _INA219_Battery.VoltageBus);
-	  	  sprintf(PointerData->MessageBatVoltageShunt,"B s:%u;",_INA219_Battery.VoltageShunt);
-	  	  sprintf(PointerData->MessageBatCurrent,"B:%d mA;",_INA219_Battery.Current);
-	  	  sprintf(PointerData->MessageBatPower,"B:%d mW;",_INA219_Battery.Power);
-	  	  sprintf(PointerData->MessagePvVoltageBus,"P:%umV;",_INA219_PV.VoltageBus);
-	      sprintf(PointerData->MessagePVVoltageShunt,"PV Voltage shunt: %u;",_INA219_PV.VoltageShunt);
-	  	  sprintf(PointerData->MessagePVCurrent,"P:%d mA;",_INA219_PV.Current);
-	  	  sprintf(PointerData->MessagePVPower,"P:%u mW;",_INA219_PV.Power);
-	  	  //  sprintf(MessageData, "Data: %02d.%02d.20%02d  Time: %02d:%02d:%02d:%02d",_RTCDate.Date,_RTCDate.Month,_RTCDate.Year,_RTCTime.Hours,_RTCTime.Minutes,_RTCTime.Seconds);
-
-
-	  	  sprintf(PointerData->MessageTimePump, "Pump:%02dMin;",_PumpDispensing);
-	  	  sprintf(PointerData->MessageFreqAlarm, "Alarm:%02dH;", _AlarmPeriod);
-
-	  	if (osOK == osSemaphoreAcquire(BinarySdCardHandle, 0)) {
-	  		  	  			osMessageQueuePut(QueSDCARDHandle,PointerData, 0, 50);
-	  		  	  		}
-
-
-
-
-	  	  GFX_DrawString(0, 0, PointerData->MessageTime, WHITE, 0);
-	  	  GFX_DrawString(70,0, PointerData->MessageBatVoltageBus,WHITE,0);
-	  	  GFX_DrawString(0, 10, PointerData->MessageTemp, WHITE, 0);
-	  	 GFX_DrawString(70,10, PointerData->MessageBatCurrent,WHITE,0);
-	  	  GFX_DrawString(0, 20, PointerData->MessageHum, WHITE, 0);
-	  	GFX_DrawString(70,20, PointerData->MessageBatPower,WHITE,0);
-	  	  GFX_DrawString(0, 30, PointerData->MessageInten, WHITE, 0);
-	  	 GFX_DrawString(70,30, PointerData->MessagePvVoltageBus,WHITE,0);
-	  	  GFX_DrawString(0, 40, PointerData->MessageTimePump, WHITE, 0);
-	  	GFX_DrawString(70,40, PointerData->MessagePVCurrent,WHITE,0);
-	  	  GFX_DrawString(0, 50, PointerData->MessageFreqAlarm, WHITE, 0);
-	  	GFX_DrawString(70,50, PointerData->MessagePVPower,WHITE,0);
+	  	  ReadSensorData(&_sensorData,&config);
+	      UpdateDisplayMessages(&_DataStructure,&_sensorData,&config);
 
 	  	  SSD1306_Display();
 
@@ -1065,24 +933,24 @@ void StartTaskCounterPump(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)== GPIO_PIN_RESET)
-	 	  {
-	 	  	  _PumpDipensing= _PumpDipensing + 1;
-	 	  		if(_PumpDipensing >=60)
-	 	  		{
-	 	  			_PumpDipensing = 1;
-	 	  		}
-	 	  		osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
-	 	  }
-	 	  else if(HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin)== GPIO_PIN_RESET)
-	 	  {
-	 		  _PumpDipensing= _PumpDipensing -1;
-	 		 	  		if(_PumpDipensing <=0)
-	 		 	  		{
-	 		 	  			_PumpDipensing = 59;
-	 		 	  		}
-	 		   osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
-	 	  }
+//	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)== GPIO_PIN_RESET)
+//	 	  {
+//	 	  	  _PumpDipensing= _PumpDipensing + 1;
+//	 	  		if(_PumpDipensing >=60)
+//	 	  		{
+//	 	  			_PumpDipensing = 1;
+//	 	  		}
+//	 	  		osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
+//	 	  }
+//	 	  else if(HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin)== GPIO_PIN_RESET)
+//	 	  {
+//	 		  _PumpDipensing= _PumpDipensing -1;
+//	 		 	  		if(_PumpDipensing <=0)
+//	 		 	  		{
+//	 		 	  			_PumpDipensing = 59;
+//	 		 	  		}
+//	 		   osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
+//	 	  }
 
 	 	  	  	tick += (220 * osKernelGetTickFreq()) / 1000;
 	 	  	  	osDelayUntil(tick);
@@ -1101,14 +969,15 @@ void StartTaskAlarmCounter(void *argument)
 {
   /* USER CODE BEGIN StartTaskAlarmCounter */
 	static uint8_t _AlarmPeriod = 1;
-	 CONFIG_MANAGER config = {
-	        .CurrentConfig = CONFIG_PUMP_TIME,
+	static  CONFIG_MANAGER config
+	= {
+	         .CurrentConfig = CONFIG_PUMP_TIME,
 	        .PumpTime = 1,
 	        .AlarmFreq = 1,
 	        .TempValue = 1,
 	        .AcceptedValue = 1
 	    };
-	CONFIG_MANAGER Config;
+
 	TBUTTON UpButton,DownButton,Activated,Option;
 	ButtonInitKey (&UpButton,&config,UP,B1_GPIO_Port,B1_Pin,200,500,700);
 
@@ -1147,7 +1016,7 @@ void StartTaskAlarmCounter(void *argument)
 //	 	 		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
 //	 	 	  }
 
-	 	 	  	  	tick += (500 * osKernelGetTickFreq()) / 1000;
+	 	 	  	  	tick += (600 * osKernelGetTickFreq()) / 1000;
 	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskAlarmCounter */
