@@ -21,7 +21,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
-#include "cmsis_os2.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -35,36 +35,40 @@
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_rtc.h"
 #include "stm32f4xx_hal_i2c.h"
-
 #include "stm32f4xx_hal_exti.h"
 #include "stm32f4xx_hal_uart.h"
 
-#include <stdio.h>
-#include <printf.h>
-#include <string.h>
+
+#include "tim.h"
+#include "bme280.h"
+#include "bh1750.h"
+#include "drv8835.h"
+#include "INA219.h"
+#include "ds3231.h"
 
 #include "usart.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "spi.h"
 #include "rtc.h"
-
-#include "tim.h"
-#include "bme280.h"
-#include "measurements.h"
-#include "SSD1306_OLED.h"
-#include "drv8835.h"
-#include "INA219.h"
-#include "ds3231.h"
-
-#include "bh1750.h"
-#include "button.h"
 #include "ff.h"
 #include "ff_gen_drv.h"
 #include "user_diskio_spi.h"
 #include "user_diskio.h"
+
 #include "GFX_BW.h"
 #include "fonts/font_8x5.h"
+
+
+#include "measurements.h"
+#include "button.h"
+#include "SSD1306_OLED.h"
+
+
+
+#include <stdio.h>
+#include <printf.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -85,6 +89,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+// Tablica kolejek z nazwami, wskaźnikami i rozmiarami
 
 
 
@@ -135,7 +140,7 @@ const osThreadAttr_t TaskPumpOFF_attributes = {
 osThreadId_t TaskCounterPumpHandle;
 const osThreadAttr_t TaskCounterPump_attributes = {
   .name = "TaskCounterPump",
-  .stack_size = 512 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskAlarmCounte */
@@ -362,6 +367,25 @@ void CallbackTimerINA219Bat(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
+/* Hook prototypes */
+void vApplicationMallocFailedHook(void);
+
+/* USER CODE BEGIN 5 */
+void vApplicationMallocFailedHook(void)
+{
+   /* vApplicationMallocFailedHook() will only be called if
+   configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
+   function that will get called if a call to pvPortMalloc() fails.
+   pvPortMalloc() is called internally by the kernel whenever a task, queue,
+   timer or semaphore is created. It is also called by various parts of the
+   demo application. If heap_1.c or heap_2.c are used, then the size of the
+   heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+   FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+   to query the size of free heap space that remains (although it does not
+   provide information on how the remaining heap might be fragmented). */
+}
+/* USER CODE END 5 */
+
 /**
   * @brief  FreeRTOS initialization
   * @param  None
@@ -463,10 +487,10 @@ void MX_FREERTOS_Init(void) {
   QueueRTCTimeHandle = osMessageQueueNew (1, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
 
   /* creation of QueueCounterPump */
-  QueueCounterPumpHandle = osMessageQueueNew (1, sizeof(uint8_t), &QueueCounterPump_attributes);
+  QueueCounterPumpHandle = osMessageQueueNew (1, sizeof(CONFIG_MANAGER), &QueueCounterPump_attributes);
 
   /* creation of QueueCounterAlarm */
-  QueueCounterAlarmHandle = osMessageQueueNew (1, sizeof(uint8_t), &QueueCounterAlarm_attributes);
+  QueueCounterAlarmHandle = osMessageQueueNew (1, sizeof(CONFIG_MANAGER), &QueueCounterAlarm_attributes);
 
   /* creation of QueSDCARD */
   QueSDCARDHandle = osMessageQueueNew (1, sizeof(Data_Structure_t), &QueSDCARD_attributes);
@@ -545,7 +569,7 @@ void StartTaskRTC(void *argument)
 {
   /* USER CODE BEGIN StartTaskRTC */
 		extern RTC_HandleTypeDef hrtc;
-		static  CONFIG_MANAGER config;
+		static CONFIG_MANAGER config;
 
 	 	 RTC_TimeTypeDef _RTCTime ={0};
 
@@ -644,15 +668,15 @@ void StartTaskRTC(void *argument)
 
 	  	if (osOK == osSemaphoreAcquire(BinarySemCounterHandle, 0))
 	  	{
-	  		osMessageQueueGet(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
+	  		osMessageQueueGet(QueueCounterPumpHandle, &config, 0, osWaitForever);
 //	  		_AlarmOFF.AlarmTime.Minutes = _PumpDispensing;
 
 	  	}
-	  	else if (osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
-	  	{
-	  		osMessageQueueGet(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
-//	  			  		_AlarmOFF.AlarmTime.Minutes = _AlarmPeriod;
-	  	}
+//	  	else if (osOK == osSemaphoreAcquire(BinarySemSetAlarmHandle, 0))
+//	  	{
+//	  		osMessageQueueGet(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
+////	  			  		_AlarmOFF.AlarmTime.Minutes = _AlarmPeriod;
+//	  	}
 
 
 	  ////	  osMessageQueueGet(QueueAlarmHandle, &_AlarmPeriod, 0, 10);
@@ -672,7 +696,7 @@ void StartTaskRTC(void *argument)
 	  		      osMutexAcquire(MutexAlarmHandle, osWaitForever);
 	  			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
 	  			  osThreadFlagsSet(TaskPumpONHandle, 0x00000001U);
-	  			  _AlarmON.AlarmTime.Hours = _AlarmON.AlarmTime.Hours + _AlarmPeriod;
+	  			  _AlarmON.AlarmTime.Hours = _AlarmON.AlarmTime.Hours + config.AlarmFreq;
 
 	  			  if(_AlarmON.AlarmTime.Hours >= 22 || _AlarmON.AlarmTime.Hours <= 8)
 	  				  {
@@ -687,7 +711,7 @@ void StartTaskRTC(void *argument)
 	  			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
 	  			  osThreadFlagsSet(TaskPumpOFFHandle, 0x00000010U);
 
-	  			  _AlarmOFF.AlarmTime.Hours = _AlarmOFF.AlarmTime.Hours + _AlarmPeriod;
+	  			  _AlarmOFF.AlarmTime.Hours = _AlarmOFF.AlarmTime.Hours + config.AlarmFreq;
 
 	  			if(_AlarmOFF.AlarmTime.Hours >= 22 || _AlarmOFF.AlarmTime.Hours <= 8)
 	  			  	 {
@@ -829,15 +853,25 @@ void StartTaskBH1750(void *argument)
 void StartTaskSSD1306(void *argument)
 {
   /* USER CODE BEGIN StartTaskSSD1306 */
-	Data_Structure_t _DataStructure;
+       Data_Structure_t _DataStructure;
+        CONFIG_MANAGER _config
+	   = {
+	   	         .CurrentConfig = CONFIG_PUMP_TIME,
+	   	        .PumpTime = 1,
+	   	        .AlarmFreq = 1,
+	   	        .TempValue = 1,
+	   	        .AcceptedValue = 1
+	   	    };
 
-	static CONFIG_MANAGER config;
-	SensorData_t _sensorData;
+
+
+        SensorData_t _sensorData;
 
 
 
 	_sensorData.RTCTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	_sensorData.RTCTime.StoreOperation = RTC_STOREOPERATION_RESET;
+
 
 	uint32_t tick2;
 
@@ -858,9 +892,8 @@ void StartTaskSSD1306(void *argument)
   for(;;)
   {
 	  	  SSD1306_Clear(BLACK);
+	  	  UpdateDisplayMessages(&_DataStructure, &_sensorData);
 
-	  	  ReadSensorData(&_sensorData,&config);
-	      UpdateDisplayMessages(&_DataStructure,&_sensorData,&config);
 
 	  	  SSD1306_Display();
 
@@ -952,7 +985,7 @@ void StartTaskCounterPump(void *argument)
 //	 		   osMessageQueuePut(QueueCounterPumpHandle, &_PumpDipensing , 0, 50);
 //	 	  }
 
-	 	  	  	tick += (220 * osKernelGetTickFreq()) / 1000;
+	 	  	  	tick += (1000 * osKernelGetTickFreq()) / 1000;
 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskCounterPump */
@@ -969,7 +1002,7 @@ void StartTaskAlarmCounter(void *argument)
 {
   /* USER CODE BEGIN StartTaskAlarmCounter */
 	static uint8_t _AlarmPeriod = 1;
-	static  CONFIG_MANAGER config
+	static CONFIG_MANAGER config
 	= {
 	         .CurrentConfig = CONFIG_PUMP_TIME,
 	        .PumpTime = 1,
@@ -978,12 +1011,12 @@ void StartTaskAlarmCounter(void *argument)
 	        .AcceptedValue = 1
 	    };
 
-	TBUTTON UpButton,DownButton,Activated,Option;
-	ButtonInitKey (&UpButton,&config,UP,B1_GPIO_Port,B1_Pin,200,500,700);
-
-	ButtonInitKey (&DownButton,&config,DOWN,B2_GPIO_Port,B2_Pin,200,500,700);
-	ButtonInitKey (&Activated,&config,ACTIVATED,B3_GPIO_Port,B3_Pin,200,500,700);
-	ButtonInitKey (&UpButton,&config,OPTION,B4_GPIO_Port,B4_Pin,200,500,700);
+//	TBUTTON UpButton,DownButton,Activated,Option;
+//	ButtonInitKey (&UpButton,&config,UP,B1_GPIO_Port,B1_Pin,220,450,500);
+//
+//	ButtonInitKey (&DownButton,&config,DOWN,B2_GPIO_Port,B2_Pin,220,400,500);
+//	ButtonInitKey (&Activated,&config,ACTIVATED,B3_GPIO_Port,B3_Pin,220,400,500);
+//	ButtonInitKey (&UpButton,&config,OPTION,B4_GPIO_Port,B4_Pin,220,400,500);
 
 
 
@@ -993,30 +1026,53 @@ void StartTaskAlarmCounter(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  ButtonTask(&UpButton,&config);
-	  ButtonTask(&DownButton,&config);
-	  ButtonTask(&Activated,&config);
-	  ButtonTask(&Option,&config);
-//	  	  	  if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
-//	 	 	  {
+//	  ButtonTask(&UpButton,&config);
+//	  ButtonTask(&DownButton,&config);
+//	  ButtonTask(&Activated,&config);
+//	  ButtonTask(&Option,&config);
+	  	  	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)== GPIO_PIN_RESET)
+	 	 	  {
+	  	  		  	 ButtonUpPressed(&config);
 //	 	 	  	  _AlarmPeriod= _AlarmPeriod + 1;
 //	 	 	  		if(_AlarmPeriod >=16)
 //	 	 	  		{
 //	 	 	  			_AlarmPeriod = 1;
 //	 	 	  		}
-//	 	 	  		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
-//	 	 	  }
-//	 	 	  else if(HAL_GPIO_ReadPin(B4_GPIO_Port, B4_Pin)== GPIO_PIN_RESET)
-//	 	 	  {
+	 	 	  		osMessageQueuePut(QueueCounterPumpHandle, &config , 0, osWaitForever);
+	 	 	  }
+	 	 	  else if(HAL_GPIO_ReadPin(B2_GPIO_Port, B2_Pin)== GPIO_PIN_RESET)
+	 	 	  {
+	 	 		  ButtonDownPressed(&config);
 //	 	 		  _AlarmPeriod= _AlarmPeriod - 1;
 //	 	 		 	  		if(_AlarmPeriod <=0)
 //	 	 		 	  		{
 //	 	 		 	  			_AlarmPeriod = 16;
 //	 	 		 	  		}
-//	 	 		   osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod , 0, 50);
-//	 	 	  }
+	 	 		   osMessageQueuePut(QueueCounterPumpHandle, &config , 0, osWaitForever);
+	 	 	  }
 
-	 	 	  	  	tick += (600 * osKernelGetTickFreq()) / 1000;
+	 	 	 else if(HAL_GPIO_ReadPin(B3_GPIO_Port, B3_Pin)== GPIO_PIN_RESET)
+	 	 		 	 	  {
+	 	 		 	 		  ButtonActivatedPressed(&config);
+	 	 	//	 	 		  _AlarmPeriod= _AlarmPeriod - 1;
+	 	 	//	 	 		 	  		if(_AlarmPeriod <=0)
+	 	 	//	 	 		 	  		{
+	 	 	//	 	 		 	  			_AlarmPeriod = 16;
+	 	 	//	 	 		 	  		}
+	 	 		 	 		   osMessageQueuePut(QueueCounterPumpHandle, &config , 0, osWaitForever);
+	 	 		 	 	  }
+	 	 	 else if(HAL_GPIO_ReadPin(B4_GPIO_Port, B4_Pin)== GPIO_PIN_RESET)
+	 	 		 	 	  {
+	 	 		 	 		  ButtonOptionPressed(&config);
+	 	 	//	 	 		  _AlarmPeriod= _AlarmPeriod - 1;
+	 	 	//	 	 		 	  		if(_AlarmPeriod <=0)
+	 	 	//	 	 		 	  		{
+	 	 	//	 	 		 	  			_AlarmPeriod = 16;
+	 	 	//	 	 		 	  		}
+	 	 		 	 		   osMessageQueuePut(QueueCounterPumpHandle, &config , 0, osWaitForever);
+	 	 		 	 	  }
+
+	 	 	  	  	tick += (240 * osKernelGetTickFreq()) / 1000;
 	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskAlarmCounter */

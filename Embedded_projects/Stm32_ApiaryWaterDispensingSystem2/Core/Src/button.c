@@ -8,128 +8,135 @@
 #include "main.h"
 #include "button.h"
 #include "cmsis_os2.h"
+#include <stdint.h>
 
 extern osMessageQueueId_t QueueCounterPumpHandle;
 
-void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat)
-{
-	key->State = IDLE;
-	key->Type = Type;
-	key->GpioPort = GpioPort;
-	key->GpioPin = GpioPin;
-	key->TimerDebounce = TimerDebounce;
-	key->TimerLongPress = TimerLongPress;
-	key->TimerRepeat = TimerRepeat;
-
-
-	 // Przypisanie domyślnych wskaźników do funkcji
-	    switch (Type)
-	    {
-	    	case OPTION:
-	               key->ButtonPressed = ButtonOptionPressed;
-	               break;
-	           case ACTIVATED:
-	        	   key->ButtonPressed = ButtonActivatedPressed;
-	               break;
-	           case UP:
-	        	   key->ButtonPressed = ButtonUpPressed;
-	               break;
-	           case DOWN:
-	        	   key->ButtonPressed = ButtonDownPressed;
-	               break;
-	           default:
-	        	   key->ButtonPressed = NULL;
-	               break;
-	    }
-
-}
+//void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat)
+//{
+//	key->State = IDLE;
+//	key->Type = Type;
+//	key->GpioPort = GpioPort;
+//	key->GpioPin = GpioPin;
+//	key->TimerDebounce = TimerDebounce;
+//	key->TimerLongPress = TimerLongPress;
+//	key->TimerRepeat = TimerRepeat;
+//
+//
+//	 // Przypisanie domyślnych wskaźników do funkcji
+//	    switch (Type)
+//	    {
+//	    	case OPTION:
+//	               key->ButtonPressed = ButtonOptionPressed;
+//	               break;
+//	           case ACTIVATED:
+//	        	   key->ButtonPressed = ButtonActivatedPressed;
+//	        	   key->ButtonLongPressed = ButtonActivatedPressed;
+//
+//	               break;
+//	           case UP:
+//	        	   key->ButtonPressed = ButtonUpPressed;
+//	               break;
+//	           case DOWN:
+//	        	   key->ButtonPressed = ButtonDownPressed;
+//	        	   key->ButtonLongPressed = ButtonDownPressed;
+////	        	   key->ButtonRepeat = ButtonDownPressed;
+//	               break;
+//	           default:
+//	        	   key->ButtonPressed = NULL;
+//	               break;
+//	    }
+//
+//}
 //time setting functions
-void ButtonSetDebounceTime(TBUTTON *key,uint32_t Miliseconds)
-{
-	key->TimerDebounce = Miliseconds;
-}
-//register buttons
-void ButtonRegisterPressCallback(TBUTTON *key,void (*Callback)())
-{
-	key->ButtonPressed = Callback;
-}
-void ButtonRegisterLongPressCallback(TBUTTON *key,void (*Callback)())
-{
-	key->ButtonLongPressed = Callback;
-}
-void ButtonRegisterRepeatCallback(TBUTTON *key,void (*Callback)())
-{
-	key->ButtonRepeat = Callback;
-}
-void ButtonIdleRoute(TBUTTON * key)
-	{
-		if(HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_RESET)
-		{
-			key->State = DEBOUNCE;
-			key->LastTick = osKernelGetTickCount();
-		}
-	}
-void ButtonDebounceRoute(TBUTTON * key, CONFIG_MANAGER *config)
-	{
-		if ((osKernelGetTickCount() - key->LastTick) > key ->TimerDebounce)
-		{
-			if(HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_RESET)
-			{
-				key->State = PRESSED;
-				key->LastTick = osKernelGetTickCount();
-				if (key->ButtonPressed != 0)
-				{
-					key->ButtonPressed(config);
-					osMessageQueuePut(QueueCounterPumpHandle, &config , 0, 50);
-
-				}
-			}
-		}
-		else
-		{
-			key->State = IDLE;
-		}
-
-	}
-void ButtonPressedRoute(TBUTTON * key,CONFIG_MANAGER *config)
-	{
-		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
-		{
-			key->State = IDLE;
-		}
-		else
-		{
-			if ((osKernelGetTickCount() - key->LastTick) > key ->TimerLongPress)
-			{
-				key->State = REPEAT;
-				key->LastTick = osKernelGetTickCount();
-				if (key->ButtonLongPressed != 0)
-					{
-						key->ButtonLongPressed(config);
-					}
-			}
-		}
-	}
-void ButtonRepeatRoute(TBUTTON * key,CONFIG_MANAGER *config)
-	{
-		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
-				{
-					key->State = IDLE;
-				}
-		else
-		{
-			if ((osKernelGetTickCount() - key->LastTick) > key ->TimerRepeat)
-			{
-				key->LastTick = osKernelGetTickCount();
-				if (key->ButtonRepeat != 0)
-					{
-
-						key->ButtonRepeat(config);
-
-					}
-			}
-		}
-	}
+//void ButtonSetDebounceTime(TBUTTON *key,uint32_t Miliseconds)
+//{
+//	key->TimerDebounce = Miliseconds;
+//}
+////register buttons
+//void ButtonRegisterPressCallback(TBUTTON *key,void (*Callback)())
+//{
+//	key->ButtonPressed = Callback;
+//}
+//void ButtonRegisterLongPressCallback(TBUTTON *key,void (*Callback)())
+//{
+//	key->ButtonLongPressed = Callback;
+//}
+//void ButtonRegisterRepeatCallback(TBUTTON *key,void (*Callback)())
+//{
+//	key->ButtonRepeat = Callback;
+//}
+//void ButtonIdleRoute(TBUTTON * key)
+//	{
+//		if(HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_RESET)
+//		{
+//			key->State = DEBOUNCE;
+//			key->LastTick = osKernelGetTickCount();
+//		}
+//	}
+//void ButtonDebounceRoute(TBUTTON * key, CONFIG_MANAGER *config)
+//	{
+//		if ((osKernelGetTickCount() - key->LastTick) > key ->TimerDebounce)
+//		{
+//			if(HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_RESET)
+//			{
+//				key->State = PRESSED;
+//				key->LastTick = osKernelGetTickCount();
+//				if (key->ButtonPressed != 0)
+//				{
+//					key->ButtonPressed(config);
+//					osMessageQueuePut(QueueCounterPumpHandle, &config , 0, 50);
+//
+//				}
+//			}
+//		}
+//		else
+//		{
+//			key->State = IDLE;
+//		}
+//
+//	}
+//void ButtonPressedRoute(TBUTTON * key,CONFIG_MANAGER *config)
+//	{
+//		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
+//		{
+//			key->State = IDLE;
+//		}
+//		else
+//		{
+//			if ((osKernelGetTickCount() - key->LastTick) > key ->TimerLongPress)
+//			{
+////				key->State = REPEAT;
+//				key->LastTick = osKernelGetTickCount();
+//				if (key->ButtonLongPressed != 0)
+//					{
+//						key->ButtonLongPressed(config);
+//						osMessageQueuePut(QueueCounterPumpHandle, &config , 0, 50);
+//					}
+//			}
+//		}
+//	}
+//void ButtonRepeatRoute(TBUTTON * key,CONFIG_MANAGER *config)
+//	{
+//		if (HAL_GPIO_ReadPin(key->GpioPort, key->GpioPin) == GPIO_PIN_SET)
+//				{
+//					key->State = IDLE;
+//				}
+//		else
+//		{
+//			if ((osKernelGetTickCount() - key->LastTick) > key ->TimerRepeat)
+//			{
+//				key->LastTick = osKernelGetTickCount();
+//				if (key->ButtonRepeat != 0)
+//					{
+//
+//						key->ButtonRepeat(config);
+//						osMessageQueuePut(QueueCounterPumpHandle, &config , 0, 50);
+//
+//					}
+//			}
+//		}
+//	}
 
 
 void ButtonUpPressed(CONFIG_MANAGER *config)
@@ -211,22 +218,22 @@ void ButtonActivatedPressed(CONFIG_MANAGER *config)
 
 
 //State machine
-void ButtonTask(TBUTTON * key,CONFIG_MANAGER *config)
-{
-	switch(key->State)
-	{
-		case IDLE:
-			ButtonIdleRoute(key);
-			break;
-		case DEBOUNCE:
-			ButtonDebounceRoute(key,config);
-			break;
-
-		case PRESSED:
-			ButtonPressedRoute(key,config);
-			break;
-		case REPEAT:
-			ButtonRepeatRoute( key,config);
-			break;
-	}
-}
+//void ButtonTask(TBUTTON * key,CONFIG_MANAGER *config)
+//{
+//	switch(key->State)
+//	{
+//		case IDLE:
+//			ButtonIdleRoute(key);
+//			break;
+//		case DEBOUNCE:
+//			ButtonDebounceRoute(key,config);
+//			break;
+//
+//		case PRESSED:
+//			ButtonPressedRoute(key,config);
+//			break;
+////		case REPEAT:
+////			ButtonRepeatRoute( key,config);
+////			break;
+//	}
+//}

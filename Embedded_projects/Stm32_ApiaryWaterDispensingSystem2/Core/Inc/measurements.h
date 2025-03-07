@@ -8,7 +8,7 @@
 #ifndef INC_MEASUREMENTS_H_
 #define INC_MEASUREMENTS_H_
 
-
+#include "button.h"
 typedef struct {
 		uint8_t Hour;
 		uint8_t Minutes;
@@ -36,19 +36,21 @@ typedef struct{
 
 }INA219Data_t;
 
-typedef union {
+typedef struct  {
     BmeData_t BmeData;
     BHData_t BHData;
     INA219Data_t INA219_Battery;
     INA219Data_t INA219_PV;
     RTC_TimeTypeDef RTCTime;
     RTC_DateTypeDef RTCData;
-
+    CONFIG_MANAGER config;
 } SensorData_t;
 
 typedef struct {
-    osMessageQueueId_t *queue;
-    const char *name;
+    osMessageQueueId_t *queue;        // Identyfikator kolejki
+    const char *name;          // Nazwa czujnika (tylko do debugowania)
+    size_t dataSize;           // Rozmiar danych w kolejce
+    void *dataPtr;             // Wskaźnik do miejsca w strukturze SensorData_t
 } SensorQueue_t;
 
 
@@ -78,7 +80,9 @@ typedef struct {
 }Data_Structure_t;
 
 
+
+
 void ReadSensorData(SensorData_t *wskSensorData,CONFIG_MANAGER *wskConfig );
-void UpdateDisplayMessages(Data_Structure_t *PointerData,SensorData_t *wskSensorData,CONFIG_MANAGER *wskConfig);
+void UpdateDisplayMessages(Data_Structure_t *PointerData,SensorData_t *wskSensorData);
 
 #endif /* INC_MEASUREMENTS_H_ */

@@ -53,7 +53,7 @@ typedef enum
 	IDLE = 0,
 	DEBOUNCE,
 	PRESSED,
-	REPEAT,
+//	REPEAT,
 }BUTTON_STATE;
 
 typedef enum
@@ -88,19 +88,19 @@ typedef struct
 }TBUTTON;
 
 //public functions
-void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat);
-void ButtonRegisterPressCallback(TBUTTON *key,void (*Callback)());
-void ButtonRegisterLongPressCallback(TBUTTON *key,void (*Callback)());
-void ButtonRegisterRepeatCallback(TBUTTON *key,void (*Callback)());
+//void ButtonInitKey (TBUTTON *key,CONFIG_MANAGER *config,BUTTON_TYPE Type,GPIO_TypeDef *GpioPort,uint16_t GpioPin,uint32_t TimerDebounce,uint32_t TimerLongPress,uint32_t TimerRepeat);
+//void ButtonRegisterPressCallback(TBUTTON *key,void (*Callback)());
+//void ButtonRegisterLongPressCallback(TBUTTON *key,void (*Callback)());
+//void ButtonRegisterRepeatCallback(TBUTTON *key,void (*Callback)());
 
 void ButtonUpPressed(CONFIG_MANAGER *config);
 void ButtonDownPressed(CONFIG_MANAGER *config);
 void ButtonOptionPressed(CONFIG_MANAGER *config);
 void ButtonActivatedPressed(CONFIG_MANAGER *config);
 
-void ButtonIdleRoute(TBUTTON * key);
-void ButtonDebounceRoute(TBUTTON * key,CONFIG_MANAGER *config);
-void ButtonPressedRoute(TBUTTON * key,CONFIG_MANAGER *config);
-void ButtonTask(TBUTTON * key,CONFIG_MANAGER *config);
+//void ButtonIdleRoute(TBUTTON * key);
+//void ButtonDebounceRoute(TBUTTON * key,CONFIG_MANAGER *config);
+//void ButtonPressedRoute(TBUTTON * key,CONFIG_MANAGER *config);
+//void ButtonTask(TBUTTON * key,CONFIG_MANAGER *config);
 
 #endif /* INC_BUTTON_H_ */
