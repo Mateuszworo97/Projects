@@ -26,9 +26,11 @@ F0 "MPPT" 50
 F1 "MPPT.sch" 50
 $EndSheet
 $Sheet
-S 4250 3850 1100 1200
+S 4200 3750 1100 1200
 U 67D47B32
-F0 "Ds3231" 50
-F1 "ds3231.sch" 50
+F0 "sensors" 50
+F1 "sensors.sch" 50
+F2 "SDA" B L 4200 3950 50 
+F3 "SCL" B L 4200 4050 50 
 $EndSheet
 $EndSCHEMATC
