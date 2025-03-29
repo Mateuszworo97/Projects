@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 4
+Sheet 1 6
 Title ""
 Date ""
 Rev ""
@@ -32,5 +32,22 @@ F0 "sensors" 50
 F1 "sensors.sch" 50
 F2 "SDA" B L 4200 3950 50 
 F3 "SCL" B L 4200 4050 50 
+$EndSheet
+$Sheet
+S 6100 3850 1150 1100
+U 67E19E2D
+F0 "sterownik_silnika" 50
+F1 "sterownik_silnika.sch" 50
+F2 "APHASE" I L 6100 4050 50 
+F3 "BPHASE" I L 6100 4140 50 
+F4 "AENBL" I L 6100 4230 50 
+F5 "BENBL" I L 6100 4320 50 
+F6 "MODE" I L 6100 4390 50 
+$EndSheet
+$Sheet
+S 7670 2200 1170 1120
+U 67E3C70E
+F0 "SPI" 50
+F1 "SPI.sch" 50
 $EndSheet
 $EndSCHEMATC
