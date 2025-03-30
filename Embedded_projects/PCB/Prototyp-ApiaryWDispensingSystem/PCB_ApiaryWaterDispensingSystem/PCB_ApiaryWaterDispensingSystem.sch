@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 6
+Sheet 1 7
 Title ""
 Date ""
 Rev ""
@@ -14,10 +14,10 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Sheet
-S 2350 1750 1050 1450
+S 1180 1410 1050 1450
 U 67C77D26
-F0 "Microcontroller" 50
-F1 "microcontroller.sch" 50
+F0 "Microcontroller_F4" 50
+F1 "microcontroller_F4.sch" 50
 $EndSheet
 $Sheet
 S 5650 2000 1450 1350
@@ -49,5 +49,11 @@ S 7670 2200 1170 1120
 U 67E3C70E
 F0 "SPI" 50
 F1 "SPI.sch" 50
+$EndSheet
+$Sheet
+S 3380 2200 900  1070
+U 6818B51C
+F0 "Microcontroller_F1" 50
+F1 "Microcontroller_F1.sch" 50
 $EndSheet
 $EndSCHEMATC

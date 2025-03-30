@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 2 6
+Sheet 2 7
 Title ""
 Date ""
 Rev ""
@@ -72,8 +72,8 @@ $Comp
 L MCU_ST_STM32F4:STM32F411RETx U?
 U 1 1 67E5B943
 P 5470 3600
-F 0 "U?" H 5470 1711 50  0000 C CNN
-F 1 "STM32F411RETx" H 5470 1620 50  0000 C CNN
+F 0 "U?" H 4890 1810 50  0000 C CNN
+F 1 "STM32F411RETx" H 6140 1810 50  0000 C CNN
 F 2 "Package_QFP:LQFP-64_10x10mm_P0.5mm" H 4870 1900 50  0001 R CNN
 F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00115249.pdf" H 5470 3600 50  0001 C CNN
 	1    5470 3600
@@ -501,18 +501,14 @@ $EndComp
 $Comp
 L power:GNDA #PWR?
 U 1 1 67EBF91F
-P 1150 1790
-F 0 "#PWR?" H 1150 1540 50  0001 C CNN
-F 1 "GNDA" H 1155 1617 50  0000 C CNN
-F 2 "" H 1150 1790 50  0001 C CNN
-F 3 "" H 1150 1790 50  0001 C CNN
-	1    1150 1790
+P 1510 1810
+F 0 "#PWR?" H 1510 1560 50  0001 C CNN
+F 1 "GNDA" H 1515 1637 50  0000 C CNN
+F 2 "" H 1510 1810 50  0001 C CNN
+F 3 "" H 1510 1810 50  0001 C CNN
+	1    1510 1810
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1150 1790 1150 1700
-Wire Wire Line
-	1150 1700 760  1700
 Wire Wire Line
 	760  1700 760  1780
 $Comp
@@ -1042,14 +1038,7 @@ Wire Wire Line
 Wire Wire Line
 	6170 5200 7210 5200
 Wire Wire Line
-	7210 5200 7210 5770
-Wire Wire Line
 	7210 5770 7690 5770
-Wire Wire Line
-	7690 5930 7210 5930
-Wire Wire Line
-	7210 5930 7210 5770
-Connection ~ 7210 5770
 Text GLabel 8350 5920 2    50   Input ~ 0
 PD8
 Text GLabel 8370 5630 2    50   Input ~ 0
@@ -1104,4 +1093,244 @@ F 3 "" H 3570 2590 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	3570 2500 3570 2590
+Wire Wire Line
+	7690 5920 7210 5920
+Wire Wire Line
+	7210 5200 7210 5770
+Connection ~ 7210 5770
+Wire Wire Line
+	7210 5770 7210 5920
+$Comp
+L Jumper:Jumper_2_Open JP59
+U 1 1 6809C0F7
+P 4650 5750
+F 0 "JP59" H 4830 5820 50  0000 C CNN
+F 1 "Jumper_2_Open" H 4740 5600 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 4650 5750 50  0001 C CNN
+F 3 "~" H 4650 5750 50  0001 C CNN
+	1    4650 5750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Open JP58
+U 1 1 6809C7A4
+P 4650 5920
+F 0 "JP58" H 4830 5990 50  0000 C CNN
+F 1 "Jumper_2_Open" H 4740 5770 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 4650 5920 50  0001 C CNN
+F 3 "~" H 4650 5920 50  0001 C CNN
+	1    4650 5920
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Open JP53
+U 1 1 6809D211
+P 4650 6090
+F 0 "JP53" H 4830 6160 50  0000 C CNN
+F 1 "Jumper_2_Open" H 4740 5940 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 4650 6090 50  0001 C CNN
+F 3 "~" H 4650 6090 50  0001 C CNN
+	1    4650 6090
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 6809E2CA
+P 4300 6090
+F 0 "#PWR?" H 4300 5840 50  0001 C CNN
+F 1 "GND" H 4305 5917 50  0000 C CNN
+F 2 "" H 4300 6090 50  0001 C CNN
+F 3 "" H 4300 6090 50  0001 C CNN
+	1    4300 6090
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4450 6090 4300 6090
+Text GLabel 4420 5920 0    50   Input ~ 0
+PF4
+Text GLabel 4420 5750 0    50   Input ~ 0
+PA3
+Wire Wire Line
+	4420 5750 4450 5750
+Wire Wire Line
+	4420 5920 4450 5920
+Wire Wire Line
+	5270 5400 5270 5750
+Wire Wire Line
+	5270 5750 5070 5750
+Wire Wire Line
+	4850 5920 5070 5920
+Connection ~ 5070 5750
+Wire Wire Line
+	5070 5750 4850 5750
+Wire Wire Line
+	4850 6090 5070 6090
+Wire Wire Line
+	5070 5750 5070 5920
+Connection ~ 5070 5920
+Wire Wire Line
+	5070 5920 5070 6090
+$Comp
+L Jumper:Jumper_2_Open JP38
+U 1 1 680D0158
+P 4990 6620
+F 0 "JP38" H 5170 6690 50  0000 C CNN
+F 1 "Jumper_2_Open" H 5080 6470 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 4990 6620 50  0001 C CNN
+F 3 "~" H 4990 6620 50  0001 C CNN
+	1    4990 6620
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C25
+U 1 1 680D049C
+P 4990 6330
+F 0 "C25" V 5120 6120 50  0000 L CNN
+F 1 "2.2uF" V 5120 6340 50  0000 L CNN
+F 2 "" H 5028 6180 50  0001 C CNN
+F 3 "~" H 4990 6330 50  0001 C CNN
+	1    4990 6330
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 680D13BD
+P 4510 6330
+F 0 "#PWR?" H 4510 6080 50  0001 C CNN
+F 1 "GND" H 4515 6157 50  0000 C CNN
+F 2 "" H 4510 6330 50  0001 C CNN
+F 3 "" H 4510 6330 50  0001 C CNN
+	1    4510 6330
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4840 6330 4690 6330
+Wire Wire Line
+	5370 6330 5140 6330
+Wire Wire Line
+	5190 6620 5370 6620
+Wire Wire Line
+	5370 5400 5370 6330
+Connection ~ 5370 6330
+Wire Wire Line
+	5370 6330 5370 6620
+Wire Wire Line
+	4790 6620 4690 6620
+Wire Wire Line
+	4690 6620 4690 6330
+Connection ~ 4690 6330
+Wire Wire Line
+	4690 6330 4510 6330
+Wire Wire Line
+	5570 6740 4690 6740
+Wire Wire Line
+	4690 6740 4690 6620
+Connection ~ 4690 6620
+Text Notes 5870 6940 2    50   ~ 0
+Ceramic low ESR
+$Comp
+L Device:C C?
+U 1 1 68102255
+P 5980 5930
+F 0 "C?" V 6110 5720 50  0000 L CNN
+F 1 "2.2uF" V 6110 5940 50  0000 L CNN
+F 2 "" H 6018 5780 50  0001 C CNN
+F 3 "~" H 5980 5930 50  0001 C CNN
+	1    5980 5930
+	0    1    1    0   
+$EndComp
+$Comp
+L Jumper:Jumper_2_Open JP33
+U 1 1 681028F8
+P 5970 6230
+F 0 "JP33" H 6150 6300 50  0000 C CNN
+F 1 "Jumper_2_Open" H 6060 6080 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 5970 6230 50  0001 C CNN
+F 3 "~" H 5970 6230 50  0001 C CNN
+	1    5970 6230
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper:Jumper_2_Open JP32
+U 1 1 68103134
+P 5980 6410
+F 0 "JP32" H 6160 6480 50  0000 C CNN
+F 1 "Jumper_2_Open" H 6070 6260 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 5980 6410 50  0001 C CNN
+F 3 "~" H 5980 6410 50  0001 C CNN
+	1    5980 6410
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5470 5400 5470 5930
+Wire Wire Line
+	5470 6230 5770 6230
+Wire Wire Line
+	5830 5930 5470 5930
+Connection ~ 5470 5930
+Wire Wire Line
+	5470 5930 5470 6230
+Wire Wire Line
+	5470 6230 5470 6410
+Wire Wire Line
+	5470 6410 5780 6410
+Connection ~ 5470 6230
+$Comp
+L power:GND #PWR?
+U 1 1 6812281A
+P 6370 5930
+F 0 "#PWR?" H 6370 5680 50  0001 C CNN
+F 1 "GND" H 6375 5757 50  0000 C CNN
+F 2 "" H 6370 5930 50  0001 C CNN
+F 3 "" H 6370 5930 50  0001 C CNN
+	1    6370 5930
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6170 6230 6270 6230
+Wire Wire Line
+	6270 6230 6270 5930
+Wire Wire Line
+	6130 5930 6270 5930
+Connection ~ 6270 5930
+Wire Wire Line
+	6270 5930 6370 5930
+Text GLabel 6360 6410 2    50   Input ~ 0
+PF6
+Wire Wire Line
+	6360 6410 6180 6410
+Text Notes 6500 5780 2    50   ~ 0
+Ceramic low ESR
+$Comp
+L power:GNDA #PWR?
+U 1 1 6814EFF6
+P 5670 5570
+F 0 "#PWR?" H 5670 5320 50  0001 C CNN
+F 1 "GNDA" H 5675 5397 50  0000 C CNN
+F 2 "" H 5670 5570 50  0001 C CNN
+F 3 "" H 5670 5570 50  0001 C CNN
+	1    5670 5570
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5670 5400 5670 5570
+Wire Wire Line
+	5570 5400 5570 6740
+$Comp
+L Jumper:Jumper_2_Open JP60
+U 1 1 6817187B
+P 1140 1700
+F 0 "JP60" H 1140 1935 50  0000 C CNN
+F 1 "Jumper_2_Open" H 1140 1550 50  0000 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 1140 1700 50  0001 C CNN
+F 3 "~" H 1140 1700 50  0001 C CNN
+	1    1140 1700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	940  1700 760  1700
+Wire Wire Line
+	1340 1700 1510 1700
+Wire Wire Line
+	1510 1700 1510 1810
 $EndSCHEMATC
