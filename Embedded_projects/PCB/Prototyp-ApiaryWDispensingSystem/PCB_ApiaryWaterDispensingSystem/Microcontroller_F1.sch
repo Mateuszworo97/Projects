@@ -1608,7 +1608,7 @@ Wire Wire Line
 	9200 3780 9020 3780
 Wire Wire Line
 	9200 4120 9200 4150
-Text GLabel 9910 3780 2    50   BiDi ~ 0
+Text GLabel 9910 3780 2    50   UnSpc ~ 0
 MCO
 Wire Wire Line
 	9910 3780 9770 3780
@@ -1808,4 +1808,72 @@ F 3 "" H 7740 4770 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	7740 4770 7740 4670
+Text Notes 1020 5840 0    118  ~ 0
+USB ST-Link
+Wire Notes Line
+	500  5500 2800 5500
+Wire Notes Line
+	2800 5500 2800 7720
+Wire Notes Line
+	2800 7720 510  7720
+Wire Notes Line
+	510  7720 510  5500
+Text GLabel 10110 1200 0    50   Output ~ 0
+STLK_TX
+Text GLabel 10140 1300 0    50   Input ~ 0
+STLK_RX
+Text HLabel 10410 1200 2    50   Output ~ 0
+STLK_TX
+Text HLabel 10410 1300 2    50   Input ~ 0
+STLK_RX
+Wire Wire Line
+	10410 1200 10110 1200
+Wire Wire Line
+	10410 1300 10140 1300
+Text GLabel 10130 1410 0    50   UnSpc ~ 0
+MCO
+Text HLabel 10460 1410 2    50   UnSpc ~ 0
+MCO
+Wire Wire Line
+	10460 1410 10130 1410
+Text GLabel 10130 1510 0    50   Output ~ 0
+PWR_ENn
+Text HLabel 10450 1510 2    50   Output ~ 0
+PWR_ENn
+Wire Wire Line
+	10450 1510 10130 1510
+Text GLabel 10130 1000 0    50   BiDi ~ 0
+TMS
+Text GLabel 10130 900  0    50   BiDi ~ 0
+TCK
+Text GLabel 10140 800  0    50   BiDi ~ 0
+NRST
+Text GLabel 10130 1100 0    50   BiDi ~ 0
+SWO
+Text HLabel 10440 800  2    50   Output ~ 0
+NRST
+Text HLabel 10440 900  2    50   Output ~ 0
+TCK
+Text HLabel 10430 1000 2    50   Output ~ 0
+TMS
+Text HLabel 10440 1100 2    50   Output ~ 0
+SWO
+Wire Wire Line
+	10130 1100 10440 1100
+Wire Wire Line
+	10430 1000 10130 1000
+Wire Wire Line
+	10130 900  10440 900 
+Wire Wire Line
+	10140 800  10440 800 
+Text Notes 10640 680  2    50   ~ 0
+PINY HIERARCHICZNE
+Wire Notes Line
+	9500 500  11200 500 
+Wire Notes Line
+	11200 500  11200 1600
+Wire Notes Line
+	11200 1600 9500 1600
+Wire Notes Line
+	9500 1600 9500 500 
 $EndSCHEMATC

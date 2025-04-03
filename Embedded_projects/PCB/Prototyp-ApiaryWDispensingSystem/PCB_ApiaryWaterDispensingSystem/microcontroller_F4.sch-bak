@@ -36,22 +36,22 @@ F 3 "~" H 1690 4780 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R29
 U 1 1 67E58F23
 P 1240 5670
-F 0 "R?" V 1033 5670 50  0000 C CNN
-F 1 "R" V 1124 5670 50  0000 C CNN
+F 0 "R29" V 1033 5670 50  0000 C CNN
+F 1 "100" V 1124 5670 50  0000 C CNN
 F 2 "" V 1170 5670 50  0001 C CNN
 F 3 "~" H 1240 5670 50  0001 C CNN
 	1    1240 5670
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C15
 U 1 1 67E59970
 P 900 5300
-F 0 "C?" H 1015 5346 50  0000 L CNN
-F 1 "C" H 1015 5255 50  0000 L CNN
+F 0 "C15" H 1015 5346 50  0000 L CNN
+F 1 "100nF" H 1015 5255 50  0000 L CNN
 F 2 "" H 938 5150 50  0001 C CNN
 F 3 "~" H 900 5300 50  0001 C CNN
 	1    900  5300
@@ -872,7 +872,7 @@ Text GLabel 6310 3900 2    50   Input ~ 0
 PB1
 Text GLabel 6310 4000 2    50   Input ~ 0
 PB2
-Text GLabel 6310 4100 2    50   Input ~ 0
+Text GLabel 6330 4100 2    50   Input ~ 0
 PB3
 Wire Wire Line
 	6310 3800 6170 3800
@@ -880,8 +880,6 @@ Wire Wire Line
 	6170 3900 6310 3900
 Wire Wire Line
 	6310 4000 6170 4000
-Wire Wire Line
-	6310 4100 6170 4100
 Text GLabel 6310 4200 2    50   Input ~ 0
 PB4
 Text GLabel 6310 4300 2    50   Input ~ 0
@@ -1333,4 +1331,128 @@ Wire Wire Line
 	1340 1700 1510 1700
 Wire Wire Line
 	1510 1700 1510 1810
+NoConn ~ 3460 5450
+NoConn ~ 3260 5450
+Text GLabel 4630 2100 0    50   BiDi ~ 0
+NRST
+Wire Wire Line
+	4630 2100 4770 2100
+$Comp
+L Switch:SW_Push_Dual B2
+U 1 1 68018B6A
+P 10690 3010
+F 0 "B2" H 10736 2722 50  0000 R CNN
+F 1 "SW_Push_Dual" H 10910 3230 50  0000 R CNN
+F 2 "" H 10690 3210 50  0001 C CNN
+F 3 "~" H 10690 3210 50  0001 C CNN
+	1    10690 3010
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 68019126
+P 10680 3430
+F 0 "C?" V 10780 3250 50  0000 L CNN
+F 1 "100n" V 10780 3470 50  0000 L CNN
+F 2 "" H 10718 3280 50  0001 C CNN
+F 3 "~" H 10680 3430 50  0001 C CNN
+	1    10680 3430
+	0    1    1    0   
+$EndComp
+Text GLabel 9900 3010 0    50   BiDi ~ 0
+NRST
+$Comp
+L power:GND #PWR?
+U 1 1 6802E6B0
+P 11000 3500
+F 0 "#PWR?" H 11000 3250 50  0001 C CNN
+F 1 "GND" H 11005 3327 50  0000 C CNN
+F 2 "" H 11000 3500 50  0001 C CNN
+F 3 "" H 11000 3500 50  0001 C CNN
+	1    11000 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10830 3430 11000 3430
+Wire Wire Line
+	11000 3430 11000 3500
+Wire Wire Line
+	10890 3210 10990 3210
+Wire Wire Line
+	11000 3210 11000 3430
+Connection ~ 11000 3430
+Wire Wire Line
+	10890 3010 10990 3010
+Wire Wire Line
+	10990 3010 10990 3210
+Connection ~ 10990 3210
+Wire Wire Line
+	10990 3210 11000 3210
+Wire Wire Line
+	9900 3010 10370 3010
+Wire Wire Line
+	10370 3430 10530 3430
+Wire Wire Line
+	10490 3210 10370 3210
+Connection ~ 10370 3210
+Wire Wire Line
+	10370 3210 10370 3430
+Wire Wire Line
+	10370 3010 10370 3210
+Connection ~ 10370 3010
+Wire Wire Line
+	10370 3010 10490 3010
+Wire Wire Line
+	1490 5670 1390 5670
+Connection ~ 1490 5670
+Text HLabel 10670 740  2    50   BiDi ~ 0
+SWO
+Wire Wire Line
+	6170 4100 6330 4100
+Text GLabel 10290 740  0    50   Input ~ 0
+PB3
+Text HLabel 10660 850  2    50   Output ~ 0
+USART_TX
+Text HLabel 10660 950  2    50   Input ~ 0
+USART_RX
+Text HLabel 10660 1050 2    50   BiDi ~ 0
+TMS
+Text HLabel 10660 1150 2    50   BiDi ~ 0
+TCK
+Text HLabel 10660 1250 2    50   BiDi ~ 0
+MCO
+Text HLabel 10660 1350 2    50   BiDi ~ 0
+NRST
+Text HLabel 10660 1450 2    50   BiDi ~ 0
+BOOT0
+Text GLabel 10280 850  0    50   Input ~ 0
+PA2
+Text GLabel 10280 950  0    50   Input ~ 0
+PA3
+Text GLabel 10280 1050 0    50   Input ~ 0
+PA13
+Text GLabel 10280 1150 0    50   Input ~ 0
+PA14
+Text GLabel 10280 1450 0    50   BiDi ~ 0
+BOOT0
+Text GLabel 10280 1350 0    50   BiDi ~ 0
+NRST
+Wire Wire Line
+	10670 740  10290 740 
+Text GLabel 10280 1250 0    50   BiDi ~ 0
+MCO
+Wire Wire Line
+	10280 850  10660 850 
+Wire Wire Line
+	10280 950  10660 950 
+Wire Wire Line
+	10280 1050 10660 1050
+Wire Wire Line
+	10660 1150 10280 1150
+Wire Wire Line
+	10660 1250 10280 1250
+Wire Wire Line
+	10660 1350 10280 1350
+Wire Wire Line
+	10660 1450 10280 1450
 $EndSCHEMATC
