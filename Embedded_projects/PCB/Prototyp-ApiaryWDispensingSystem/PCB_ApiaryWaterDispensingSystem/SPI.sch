@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 6 7
+Sheet 6 9
 Title ""
 Date ""
 Rev ""
@@ -29,10 +29,10 @@ F 7 "CUI Devices" H 5880 1800 50  0001 L BNN "MANUFACTURER"
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:+3.3V #PWR?
+L power:+3.3V #PWR0174
 U 1 1 67E4A022
 P 5230 860
-F 0 "#PWR?" H 5230 710 50  0001 C CNN
+F 0 "#PWR0174" H 5230 710 50  0001 C CNN
 F 1 "+3.3V" H 5245 1033 50  0000 C CNN
 F 2 "" H 5230 860 50  0001 C CNN
 F 3 "" H 5230 860 50  0001 C CNN
@@ -134,10 +134,10 @@ F 3 "~" H 1370 900 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L power:+3.3V #PWR?
+L power:+3.3V #PWR0175
 U 1 1 67E56C81
 P 940 600
-F 0 "#PWR?" H 940 450 50  0001 C CNN
+F 0 "#PWR0175" H 940 450 50  0001 C CNN
 F 1 "+3.3V" H 730 650 50  0000 C CNN
 F 2 "" H 940 600 50  0001 C CNN
 F 3 "" H 940 600 50  0001 C CNN
@@ -279,4 +279,20 @@ Text GLabel 1010 2670 0    50   BiDi ~ 0
 DAT3
 Text GLabel 1010 2770 0    50   Input ~ 0
 CD
+Text HLabel 1510 2170 2    50   Input ~ 0
+SPI3_SCK
+Text HLabel 1510 2270 2    50   Input ~ 0
+SPI3_MOSI
+Text HLabel 1510 2370 2    50   Input ~ 0
+SPI3_MISO
+Text HLabel 1520 2670 2    50   Input ~ 0
+SPI3_CS
+Wire Wire Line
+	1510 2170 970  2170
+Wire Wire Line
+	1510 2270 990  2270
+Wire Wire Line
+	1510 2370 1010 2370
+Wire Wire Line
+	1520 2670 1010 2670
 $EndSCHEMATC
