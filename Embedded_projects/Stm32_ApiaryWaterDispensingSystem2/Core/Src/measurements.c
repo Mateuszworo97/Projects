@@ -65,25 +65,25 @@ void UpdateDisplayMessages(Data_Structure_t *PointerData, SensorData_t *wskSenso
     SSD1306_Clear(BLACK);
 
     // Pobieranie danych z kolejki
-    osMessageQueueGet(QueueBmeHandle, &wskSensorData->BmeData, 0, 50);
+    osMessageQueueGet(QueueBmeHandle, &wskSensorData->BmeData, 0, 20);
     printf("1\n\r");
-    osMessageQueueGet(QueueBh1750Handle, &wskSensorData->BHData, 0, 50);
+    osMessageQueueGet(QueueBh1750Handle, &wskSensorData->BHData, 0, 20);
     printf("2\n\r");
-    osMessageQueueGet(QuequeBatteryHandle, &wskSensorData->INA219_Battery, 0, 50);
+    osMessageQueueGet(QuequeBatteryHandle, &wskSensorData->INA219_Battery, 0, 20);
     printf("3\n\r");
-    osMessageQueueGet(QueuePVHandle, &wskSensorData->INA219_PV, 0, 100);
+    osMessageQueueGet(QueuePVHandle, &wskSensorData->INA219_PV, 0, 40);
     printf("4\n\r");
 
     // Pobieranie czasu RTC i daty
-    if (osOK == osMessageQueueGet(QueueRTCTimeHandle, &wskSensorData->RTCTime, 0, 50)) {
+    if (osOK == osMessageQueueGet(QueueRTCTimeHandle, &wskSensorData->RTCTime, 0, 20)) {
         printf("5\n\r");
     }
-    if (osOK == osMessageQueueGet(QueueRTCDataHandle, &wskSensorData->RTCData, 0, 50)) {
+    if (osOK == osMessageQueueGet(QueueRTCDataHandle, &wskSensorData->RTCData, 0, 20)) {
         printf("6\n\r");
     }
 
     // Pobieranie danych pompy
-    if (osOK == osMessageQueueGet(QueueCounterPumpHandle, &wskSensorData->config, 0, 50)) {
+    if (osOK == osMessageQueueGet(QueueCounterPumpHandle, &wskSensorData->config, 0, 20)) {
         osMessageQueuePut(QueueCounterPumpHandle, &wskSensorData->config, 0, osWaitForever);
         osSemaphoreRelease(BinarySemCounterHandle);
     }
