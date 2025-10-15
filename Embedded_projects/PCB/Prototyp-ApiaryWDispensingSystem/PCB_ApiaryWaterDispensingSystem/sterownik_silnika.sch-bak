@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 9
+Sheet 4 9
 Title ""
 Date ""
 Rev ""
@@ -19,7 +19,7 @@ U 1 1 67E1F6B2
 P 860 2550
 F 0 "POMPA_1" H 778 2225 50  0000 C CNN
 F 1 "Conn_01x02" H 778 2316 50  0000 C CNN
-F 2 "" H 860 2550 50  0001 C CNN
+F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 860 2550 50  0001 C CNN
 F 3 "~" H 860 2550 50  0001 C CNN
 	1    860  2550
 	-1   0    0    1   
@@ -63,7 +63,7 @@ Wire Wire Line
 Wire Wire Line
 	3170 2800 3170 3050
 Text GLabel 5280 2400 2    50   Input ~ 0
-BENBL
+BENABLE
 Text GLabel 5270 2500 2    50   Input ~ 0
 BPHASE
 Text GLabel 5270 2600 2    50   Input ~ 0
@@ -77,17 +77,17 @@ APHASE
 Text HLabel 890  790  0    50   Input ~ 0
 BPHASE
 Text HLabel 890  900  0    50   Input ~ 0
-AENBL
+AENABLE
 Text HLabel 890  700  0    50   Input ~ 0
-BENBL
+BENABLE
 Text HLabel 890  1100 0    50   Input ~ 0
 MODE
 Text GLabel 1090 700  2    50   Input ~ 0
-BENBL
+BENABLE
 Text GLabel 1090 790  2    50   Input ~ 0
 BPHASE
 Text GLabel 1090 900  2    50   Input ~ 0
-AENBL
+AENABLE
 Text GLabel 1090 1000 2    50   Input ~ 0
 APHASE
 Text GLabel 1090 1100 2    50   Input ~ 0
@@ -185,17 +185,6 @@ Wire Wire Line
 Text Notes 2600 2730 0    50   ~ 0
 MOSTKOWANIE
 $Comp
-L power:+3V3 #PWR0165
-U 1 1 67E398B8
-P 4550 1410
-F 0 "#PWR0165" H 4550 1260 50  0001 C CNN
-F 1 "+3V3" H 4565 1583 50  0000 C CNN
-F 2 "" H 4550 1410 50  0001 C CNN
-F 3 "" H 4550 1410 50  0001 C CNN
-	1    4550 1410
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:GND #PWR0166
 U 1 1 67E3A3D8
 P 4820 1980
@@ -212,7 +201,7 @@ U 1 1 67E3B4B9
 P 4820 1720
 F 0 "C?" H 4935 1766 50  0000 L CNN
 F 1 "100n" H 4935 1675 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 4858 1570 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 4858 1570 50  0001 C CNN
 F 3 "~" H 4820 1720 50  0001 C CNN
 	1    4820 1720
 	1    0    0    -1  
@@ -228,8 +217,8 @@ L Device:D_Schottky D?
 U 1 1 67E41C38
 P 7400 1150
 F 0 "D?" V 7354 1230 50  0000 L CNN
-F 1 "D_Schottky 6,8 V" V 7540 1050 50  0000 L CNN
-F 2 "" H 7400 1150 50  0001 C CNN
+F 1 "D_Schottky 6,8 V SMAZ6V8" V 7430 -270 50  0000 L CNN
+F 2 "Diode_SMD:D_SMA" H 7400 1150 50  0001 C CNN
 F 3 "~" H 7400 1150 50  0001 C CNN
 	1    7400 1150
 	0    1    1    0   
@@ -240,7 +229,7 @@ U 1 1 67E428F8
 P 7400 1570
 F 0 "R?" H 7470 1616 50  0000 L CNN
 F 1 "100k" H 7470 1525 50  0000 L CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 7330 1570 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7330 1570 50  0001 C CNN
 F 3 "~" H 7400 1570 50  0001 C CNN
 	1    7400 1570
 	1    0    0    -1  
@@ -251,7 +240,7 @@ U 1 1 67E42C3E
 P 8100 1140
 F 0 "R?" H 8170 1186 50  0000 L CNN
 F 1 "1" H 8170 1095 50  0000 L CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 8030 1140 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 8030 1140 50  0001 C CNN
 F 3 "~" H 8100 1140 50  0001 C CNN
 	1    8100 1140
 	1    0    0    -1  
@@ -262,7 +251,7 @@ U 1 1 67E4304B
 P 8100 1540
 F 0 "C?" H 8215 1586 50  0000 L CNN
 F 1 "10u" H 8215 1495 50  0000 L CNN
-F 2 "" H 8138 1390 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 8138 1390 50  0001 C CNN
 F 3 "~" H 8100 1540 50  0001 C CNN
 	1    8100 1540
 	1    0    0    -1  
@@ -273,7 +262,7 @@ U 1 1 67E439CE
 P 8500 1150
 F 0 "C?" H 8615 1196 50  0000 L CNN
 F 1 "100n" H 8615 1105 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 8538 1000 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 8538 1000 50  0001 C CNN
 F 3 "~" H 8500 1150 50  0001 C CNN
 	1    8500 1150
 	1    0    0    -1  
@@ -308,7 +297,7 @@ U 1 1 67E3DE47
 P 7080 1010
 F 0 "Q?" V 7422 1010 50  0000 C CNN
 F 1 "Q_PMOS_GSD" V 7331 1010 50  0000 C CNN
-F 2 "" H 7280 1110 50  0001 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 7280 1110 50  0001 C CNN
 F 3 "~" H 7080 1010 50  0001 C CNN
 	1    7080 1010
 	0    -1   -1   0   
@@ -406,7 +395,7 @@ F 3 "" H 8500 1930 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	8500 1300 8500 1930
-Text Notes 760  4170 0    79   ~ 0
+Text Notes 745  4075 0    79   ~ 0
 Oddzielenie masy cześci analogowej i cyfrowej
 $Comp
 L power:GNDA #PWR0172
@@ -432,31 +421,10 @@ F 3 "" H 1450 3690 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1080 3690 1450 3690
-$Comp
-L Device:R R?
-U 1 1 67FBCED9
-P 1800 4410
-F 0 "R?" V 1700 4290 50  0000 L CNN
-F 1 "0" V 1700 4480 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical" V 1730 4410 50  0001 C CNN
-F 3 "~" H 1800 4410 50  0001 C CNN
-	1    1800 4410
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	1950 4410 2180 4410
-Wire Wire Line
-	2180 4410 2180 4530
-Wire Wire Line
-	1650 4410 1470 4410
-Wire Wire Line
-	1470 4410 1470 4520
 Text Notes 2560 1960 0    50   ~ 0
 Digital PART
 Text Notes 7350 610  0    50   ~ 0
 Analog Part
-Wire Wire Line
-	4550 1410 4550 1500
 Wire Wire Line
 	4820 1980 4820 1870
 Wire Wire Line
@@ -466,4 +434,44 @@ Wire Wire Line
 Connection ~ 4550 1500
 Wire Wire Line
 	4550 1500 4550 2200
+$Comp
+L Connector_Generic:Conn_02x01 J?
+U 1 1 68EF4B8A
+P 1720 4335
+F 0 "J?" H 1760 4215 50  0000 C CNN
+F 1 "Conn_02x01" H 1770 4461 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 1720 4335 50  0001 C CNN
+F 3 "~" H 1720 4335 50  0001 C CNN
+	1    1720 4335
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1470 4335 1520 4335
+Wire Wire Line
+	1470 4335 1470 4520
+Wire Wire Line
+	2020 4335 2180 4335
+Wire Wire Line
+	2180 4335 2180 4530
+Text Notes 5260 785  0    50   ~ 0
+Tranzystor P-MOSFET FDN338P SOT23 
+$Comp
+L power:VDD #PWR?
+U 1 1 68F93D47
+P 4550 1350
+F 0 "#PWR?" H 4550 1200 50  0001 C CNN
+F 1 "VDD" H 4565 1523 50  0000 C CNN
+F 2 "" H 4550 1350 50  0001 C CNN
+F 3 "" H 4550 1350 50  0001 C CNN
+	1    4550 1350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 1350 4550 1500
+Text GLabel 1090 1225 2    50   Input ~ 0
+VM
+Text HLabel 870  1225 0    50   Input ~ 0
+VM
+Wire Wire Line
+	1090 1225 870  1225
 $EndSCHEMATC
