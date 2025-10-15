@@ -175,7 +175,7 @@ const osThreadAttr_t TaskPumpOFF_attributes = {
 osThreadId_t TaskCounterPumpHandle;
 const osThreadAttr_t TaskCounterPump_attributes = {
   .name = "TaskCounterPump",
-  .stack_size = 512 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TaskAlarmCounte */
@@ -212,6 +212,13 @@ const osThreadAttr_t TaskDS3231_attributes = {
   .name = "TaskDS3231",
   .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for TaskSleep */
+osThreadId_t TaskSleepHandle;
+const osThreadAttr_t TaskSleep_attributes = {
+  .name = "TaskSleep",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for QueueBme */
 osMessageQueueId_t QueueBmeHandle;
@@ -298,6 +305,11 @@ osTimerId_t TimerINA219BatHandle;
 const osTimerAttr_t TimerINA219Bat_attributes = {
   .name = "TimerINA219Bat"
 };
+/* Definitions for TIMER_Sleep */
+osTimerId_t TIMER_SleepHandle;
+const osTimerAttr_t TIMER_Sleep_attributes = {
+  .name = "TIMER_Sleep"
+};
 /* Definitions for MutexPrintf */
 osMutexId_t MutexPrintfHandle;
 const osMutexAttr_t MutexPrintf_attributes = {
@@ -373,6 +385,11 @@ osSemaphoreId_t BinarySemIna219BatHandle;
 const osSemaphoreAttr_t BinarySemIna219Bat_attributes = {
   .name = "BinarySemIna219Bat"
 };
+/* Definitions for BinarySemSleep */
+osSemaphoreId_t BinarySemSleepHandle;
+const osSemaphoreAttr_t BinarySemSleep_attributes = {
+  .name = "BinarySemSleep"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -392,14 +409,35 @@ void StartTaskSdCard(void *argument);
 void StartTaskINA219(void *argument);
 void StartTaskINA219PV(void *argument);
 void StartTaskDS3231(void *argument);
+void StartTaskSleep(void *argument);
 void CallbackTimerBmeData(void *argument);
 void CallbackTimerBh1750Data(void *argument);
 void CallbackTimerRTC(void *argument);
 void CallbackTimerSDCard(void *argument);
 void CallbackTimerINA219(void *argument);
 void CallbackTimerINA219Bat(void *argument);
+void CallbackTimerSleep(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* Hook prototypes */
+void vApplicationMallocFailedHook(void);
+
+/* USER CODE BEGIN 5 */
+void vApplicationMallocFailedHook(void)
+{
+   /* vApplicationMallocFailedHook() will only be called if
+   configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
+   function that will get called if a call to pvPortMalloc() fails.
+   pvPortMalloc() is called internally by the kernel whenever a task, queue,
+   timer or semaphore is created. It is also called by various parts of the
+   demo application. If heap_1.c or heap_2.c are used, then the size of the
+   heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+   FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+   to query the size of free heap space that remains (although it does not
+   provide information on how the remaining heap might be fragmented). */
+}
+/* USER CODE END 5 */
 
 /**
   * @brief  FreeRTOS initialization
@@ -461,6 +499,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of BinarySemIna219Bat */
   BinarySemIna219BatHandle = osSemaphoreNew(1, 1, &BinarySemIna219Bat_attributes);
 
+  /* creation of BinarySemSleep */
+  BinarySemSleepHandle = osSemaphoreNew(1, 1, &BinarySemSleep_attributes);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -484,6 +525,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of TimerINA219Bat */
   TimerINA219BatHandle = osTimerNew(CallbackTimerINA219Bat, osTimerPeriodic, NULL, &TimerINA219Bat_attributes);
 
+  /* creation of TIMER_Sleep */
+  TIMER_SleepHandle = osTimerNew(CallbackTimerSleep, osTimerPeriodic, NULL, &TIMER_Sleep_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
@@ -499,13 +543,13 @@ void MX_FREERTOS_Init(void) {
   QueueRTCDataHandle = osMessageQueueNew (1, sizeof(RTC_DateTypeDef), &QueueRTCData_attributes);
 
   /* creation of QueueRTCTime */
-  QueueRTCTimeHandle = osMessageQueueNew (1, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
+  QueueRTCTimeHandle = osMessageQueueNew (5, sizeof(RTC_TimeTypeDef), &QueueRTCTime_attributes);
 
   /* creation of QueueCounterPump */
-  QueueCounterPumpHandle = osMessageQueueNew (1, sizeof(uint8_t), &QueueCounterPump_attributes);
+  QueueCounterPumpHandle = osMessageQueueNew (1, sizeof(CONFIG_MANAGER), &QueueCounterPump_attributes);
 
   /* creation of QueueCounterAlarm */
-  QueueCounterAlarmHandle = osMessageQueueNew (1, sizeof(uint8_t), &QueueCounterAlarm_attributes);
+  QueueCounterAlarmHandle = osMessageQueueNew (1, sizeof(CONFIG_MANAGER), &QueueCounterAlarm_attributes);
 
   /* creation of QueSDCARD */
   QueSDCARDHandle = osMessageQueueNew (1, sizeof(Data_Structure_t), &QueSDCARD_attributes);
@@ -562,6 +606,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of TaskDS3231 */
   TaskDS3231Handle = osThreadNew(StartTaskDS3231, NULL, &TaskDS3231_attributes);
+
+  /* creation of TaskSleep */
+  TaskSleepHandle = osThreadNew(StartTaskSleep, NULL, &TaskSleep_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -628,6 +675,8 @@ void StartTaskRTC(void *argument)
 
 		osMessageQueuePut(QueueCounterAlarmHandle, &_AlarmPeriod, 0, osWaitForever);
 		osMessageQueuePut(QueueCounterPumpHandle, &_PumpDispensing, 0, osWaitForever);
+
+
 	 	osTimerStart(TimerRTCHandle, 300);
 	 	uint32_t tick4 = osKernelGetTickCount();
   /* Infinite loop */
@@ -899,7 +948,7 @@ void StartTaskSSD1306(void *argument)
 	SSD1306_Clear(BLACK);
 	SSD1306_Display();
 
-	osTimerStart(TimerSDCardHandle, 20000);
+	osTimerStart(TimerSDCardHandle, 300000);
 	tick2 = osKernelGetTickCount();
   /* Infinite loop */
   for(;;)
@@ -1268,7 +1317,7 @@ void StartTaskSdCard(void *argument)
 
 
 
-			tick += (10000 * osKernelGetTickFreq()) / 1000;
+			tick += (150000 * osKernelGetTickFreq()) / 1000;
 				  	 	 	  	  	osDelayUntil(tick);
   }
   /* USER CODE END StartTaskSdCard */
@@ -1451,6 +1500,24 @@ void StartTaskDS3231(void *argument)
   /* USER CODE END StartTaskDS3231 */
 }
 
+/* USER CODE BEGIN Header_StartTaskSleep */
+/**
+* @brief Function implementing the TaskSleep thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskSleep */
+void StartTaskSleep(void *argument)
+{
+  /* USER CODE BEGIN StartTaskSleep */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartTaskSleep */
+}
+
 /* CallbackTimerBmeData function */
 void CallbackTimerBmeData(void *argument)
 {
@@ -1497,6 +1564,14 @@ void CallbackTimerINA219Bat(void *argument)
   /* USER CODE BEGIN CallbackTimerINA219Bat */
 	osSemaphoreRelease(BinarySemIna219BatHandle);
   /* USER CODE END CallbackTimerINA219Bat */
+}
+
+/* CallbackTimerSleep function */
+void CallbackTimerSleep(void *argument)
+{
+  /* USER CODE BEGIN CallbackTimerSleep */
+
+  /* USER CODE END CallbackTimerSleep */
 }
 
 /* Private application code --------------------------------------------------*/
