@@ -45,7 +45,7 @@ Development
 
 Visualization
 ------------
-image::    Embedded_projects/docs/images/3D_visualization.png
+image::Embedded_projects/docs/images/3D_visualization.png
     :alt: Visualization
     :align: center
 
