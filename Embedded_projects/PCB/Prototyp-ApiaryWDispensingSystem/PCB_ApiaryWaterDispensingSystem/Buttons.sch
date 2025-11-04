@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 8 9
+Sheet 7 9
 Title ""
 Date ""
 Rev ""
@@ -14,27 +14,14 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Switch:SW_Push_Dual SW?
-U 1 1 682DA793
-P 1880 2090
-AR Path="/67C77D26/682DA793" Ref="SW?"  Part="1" 
-AR Path="/6823454A/682DA793" Ref="SW?"  Part="1" 
-F 0 "SW?" V 1926 1802 50  0000 R CNN
-F 1 "SW_Push_Dual" V 1690 2690 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 1880 2290 50  0001 C CNN
-F 3 "~" H 1880 2290 50  0001 C CNN
-	1    1880 2090
-	0    1    -1   0   
-$EndComp
-$Comp
 L Device:R R?
 U 1 1 682DA799
 P 1880 1580
 AR Path="/67C77D26/682DA799" Ref="R?"  Part="1" 
-AR Path="/6823454A/682DA799" Ref="R?"  Part="1" 
-F 0 "R?" H 1950 1626 50  0000 L CNN
+AR Path="/6823454A/682DA799" Ref="R64"  Part="1" 
+F 0 "R64" H 1950 1626 50  0000 L CNN
 F 1 "4k7" H 1950 1535 50  0000 L CNN
-F 2 "" V 1810 1580 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 1810 1580 50  0001 C CNN
 F 3 "~" H 1880 1580 50  0001 C CNN
 	1    1880 1580
 	1    0    0    -1  
@@ -44,10 +31,10 @@ L Device:R R?
 U 1 1 682DA79F
 P 1430 2470
 AR Path="/67C77D26/682DA79F" Ref="R?"  Part="1" 
-AR Path="/6823454A/682DA79F" Ref="R?"  Part="1" 
-F 0 "R?" V 1223 2470 50  0000 C CNN
+AR Path="/6823454A/682DA79F" Ref="R63"  Part="1" 
+F 0 "R63" V 1223 2470 50  0000 C CNN
 F 1 "100" V 1314 2470 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 1360 2470 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 1360 2470 50  0001 C CNN
 F 3 "~" H 1430 2470 50  0001 C CNN
 	1    1430 2470
 	0    1    1    0   
@@ -57,10 +44,10 @@ L Device:C C?
 U 1 1 682DA7A5
 P 1090 2100
 AR Path="/67C77D26/682DA7A5" Ref="C?"  Part="1" 
-AR Path="/6823454A/682DA7A5" Ref="C?"  Part="1" 
-F 0 "C?" H 1205 2146 50  0000 L CNN
+AR Path="/6823454A/682DA7A5" Ref="C47"  Part="1" 
+F 0 "C47" H 1205 2146 50  0000 L CNN
 F 1 "100nF" H 1205 2055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 1128 1950 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 1128 1950 50  0001 C CNN
 F 3 "~" H 1090 2100 50  0001 C CNN
 	1    1090 2100
 	1    0    0    -1  
@@ -70,16 +57,14 @@ L Jumper:Jumper_2_Open JP?
 U 1 1 682DA7AB
 P 2620 1800
 AR Path="/67C77D26/682DA7AB" Ref="JP?"  Part="1" 
-AR Path="/6823454A/682DA7AB" Ref="JP?"  Part="1" 
-F 0 "JP?" H 2620 2035 50  0000 C CNN
+AR Path="/6823454A/682DA7AB" Ref="JP69"  Part="1" 
+F 0 "JP69" H 2620 2035 50  0000 C CNN
 F 1 "Jumper_2_Open" H 2620 1650 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 2620 1800 50  0001 C CNN
 F 3 "~" H 2620 1800 50  0001 C CNN
 	1    2620 1800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1880 1890 1880 1800
 Wire Wire Line
 	1680 1890 1680 1800
 Wire Wire Line
@@ -101,12 +86,9 @@ F 3 "" H 1880 2610 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1880 2290 1880 2470
-Wire Wire Line
 	1680 2290 1680 2470
 Wire Wire Line
 	1680 2470 1880 2470
-Connection ~ 1880 2470
 Wire Wire Line
 	1880 2470 1880 2610
 Wire Wire Line
@@ -126,27 +108,14 @@ Connection ~ 1680 2470
 Text Notes 1080 1510 0    50   ~ 0
 UP BUTTON
 $Comp
-L Switch:SW_Push_Dual SW?
-U 1 1 682DEDA4
-P 4450 2090
-AR Path="/67C77D26/682DEDA4" Ref="SW?"  Part="1" 
-AR Path="/6823454A/682DEDA4" Ref="SW?"  Part="1" 
-F 0 "SW?" V 4496 1802 50  0000 R CNN
-F 1 "SW_Push_Dual" V 4260 2690 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 4450 2290 50  0001 C CNN
-F 3 "~" H 4450 2290 50  0001 C CNN
-	1    4450 2090
-	0    1    -1   0   
-$EndComp
-$Comp
 L Device:R R?
 U 1 1 682DEDAA
 P 4450 1580
 AR Path="/67C77D26/682DEDAA" Ref="R?"  Part="1" 
-AR Path="/6823454A/682DEDAA" Ref="R?"  Part="1" 
-F 0 "R?" H 4520 1626 50  0000 L CNN
+AR Path="/6823454A/682DEDAA" Ref="R66"  Part="1" 
+F 0 "R66" H 4520 1626 50  0000 L CNN
 F 1 "4k7" H 4520 1535 50  0000 L CNN
-F 2 "" V 4380 1580 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 4380 1580 50  0001 C CNN
 F 3 "~" H 4450 1580 50  0001 C CNN
 	1    4450 1580
 	1    0    0    -1  
@@ -156,10 +125,10 @@ L Device:R R?
 U 1 1 682DEDB0
 P 4000 2470
 AR Path="/67C77D26/682DEDB0" Ref="R?"  Part="1" 
-AR Path="/6823454A/682DEDB0" Ref="R?"  Part="1" 
-F 0 "R?" V 3793 2470 50  0000 C CNN
+AR Path="/6823454A/682DEDB0" Ref="R65"  Part="1" 
+F 0 "R65" V 3793 2470 50  0000 C CNN
 F 1 "100" V 3884 2470 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 3930 2470 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3930 2470 50  0001 C CNN
 F 3 "~" H 4000 2470 50  0001 C CNN
 	1    4000 2470
 	0    1    1    0   
@@ -169,10 +138,10 @@ L Device:C C?
 U 1 1 682DEDB6
 P 3660 2100
 AR Path="/67C77D26/682DEDB6" Ref="C?"  Part="1" 
-AR Path="/6823454A/682DEDB6" Ref="C?"  Part="1" 
-F 0 "C?" H 3775 2146 50  0000 L CNN
+AR Path="/6823454A/682DEDB6" Ref="C48"  Part="1" 
+F 0 "C48" H 3775 2146 50  0000 L CNN
 F 1 "100nF" H 3775 2055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 3698 1950 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 3698 1950 50  0001 C CNN
 F 3 "~" H 3660 2100 50  0001 C CNN
 	1    3660 2100
 	1    0    0    -1  
@@ -182,16 +151,14 @@ L Jumper:Jumper_2_Open JP?
 U 1 1 682DEDBC
 P 5190 1800
 AR Path="/67C77D26/682DEDBC" Ref="JP?"  Part="1" 
-AR Path="/6823454A/682DEDBC" Ref="JP?"  Part="1" 
-F 0 "JP?" H 5190 2035 50  0000 C CNN
+AR Path="/6823454A/682DEDBC" Ref="JP70"  Part="1" 
+F 0 "JP70" H 5190 2035 50  0000 C CNN
 F 1 "Jumper_2_Open" H 5190 1650 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 5190 1800 50  0001 C CNN
 F 3 "~" H 5190 1800 50  0001 C CNN
 	1    5190 1800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4450 1890 4450 1800
 Wire Wire Line
 	4250 1890 4250 1800
 Wire Wire Line
@@ -213,12 +180,9 @@ F 3 "" H 4450 2610 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4450 2290 4450 2470
-Wire Wire Line
 	4250 2290 4250 2470
 Wire Wire Line
 	4250 2470 4450 2470
-Connection ~ 4450 2470
 Wire Wire Line
 	4450 2470 4450 2610
 Wire Wire Line
@@ -238,27 +202,14 @@ Connection ~ 4250 2470
 Text Notes 3650 1510 0    50   ~ 0
 DOWN BUTTON
 $Comp
-L Switch:SW_Push_Dual SW?
-U 1 1 682E3074
-P 6970 2090
-AR Path="/67C77D26/682E3074" Ref="SW?"  Part="1" 
-AR Path="/6823454A/682E3074" Ref="SW?"  Part="1" 
-F 0 "SW?" V 7016 1802 50  0000 R CNN
-F 1 "SW_Push_Dual" V 6780 2690 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 6970 2290 50  0001 C CNN
-F 3 "~" H 6970 2290 50  0001 C CNN
-	1    6970 2090
-	0    1    -1   0   
-$EndComp
-$Comp
 L Device:R R?
 U 1 1 682E307A
 P 6970 1580
 AR Path="/67C77D26/682E307A" Ref="R?"  Part="1" 
-AR Path="/6823454A/682E307A" Ref="R?"  Part="1" 
-F 0 "R?" H 7040 1626 50  0000 L CNN
+AR Path="/6823454A/682E307A" Ref="R68"  Part="1" 
+F 0 "R68" H 7040 1626 50  0000 L CNN
 F 1 "4k7" H 7040 1535 50  0000 L CNN
-F 2 "" V 6900 1580 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 6900 1580 50  0001 C CNN
 F 3 "~" H 6970 1580 50  0001 C CNN
 	1    6970 1580
 	1    0    0    -1  
@@ -268,10 +219,10 @@ L Device:R R?
 U 1 1 682E3080
 P 6520 2470
 AR Path="/67C77D26/682E3080" Ref="R?"  Part="1" 
-AR Path="/6823454A/682E3080" Ref="R?"  Part="1" 
-F 0 "R?" V 6313 2470 50  0000 C CNN
+AR Path="/6823454A/682E3080" Ref="R67"  Part="1" 
+F 0 "R67" V 6313 2470 50  0000 C CNN
 F 1 "100" V 6404 2470 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 6450 2470 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 6450 2470 50  0001 C CNN
 F 3 "~" H 6520 2470 50  0001 C CNN
 	1    6520 2470
 	0    1    1    0   
@@ -281,10 +232,10 @@ L Device:C C?
 U 1 1 682E3086
 P 6180 2100
 AR Path="/67C77D26/682E3086" Ref="C?"  Part="1" 
-AR Path="/6823454A/682E3086" Ref="C?"  Part="1" 
-F 0 "C?" H 6295 2146 50  0000 L CNN
+AR Path="/6823454A/682E3086" Ref="C49"  Part="1" 
+F 0 "C49" H 6295 2146 50  0000 L CNN
 F 1 "100nF" H 6295 2055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 6218 1950 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6218 1950 50  0001 C CNN
 F 3 "~" H 6180 2100 50  0001 C CNN
 	1    6180 2100
 	1    0    0    -1  
@@ -294,16 +245,14 @@ L Jumper:Jumper_2_Open JP?
 U 1 1 682E308C
 P 7710 1800
 AR Path="/67C77D26/682E308C" Ref="JP?"  Part="1" 
-AR Path="/6823454A/682E308C" Ref="JP?"  Part="1" 
-F 0 "JP?" H 7710 2035 50  0000 C CNN
+AR Path="/6823454A/682E308C" Ref="JP71"  Part="1" 
+F 0 "JP71" H 7710 2035 50  0000 C CNN
 F 1 "Jumper_2_Open" H 7710 1650 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 7710 1800 50  0001 C CNN
 F 3 "~" H 7710 1800 50  0001 C CNN
 	1    7710 1800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	6970 1890 6970 1800
 Wire Wire Line
 	6770 1890 6770 1800
 Wire Wire Line
@@ -325,12 +274,9 @@ F 3 "" H 6970 2610 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6970 2290 6970 2470
-Wire Wire Line
 	6770 2290 6770 2470
 Wire Wire Line
 	6770 2470 6970 2470
-Connection ~ 6970 2470
 Wire Wire Line
 	6970 2470 6970 2610
 Wire Wire Line
@@ -350,27 +296,14 @@ Connection ~ 6770 2470
 Text Notes 6170 1510 0    50   ~ 0
 ACTIVATED BUTTON
 $Comp
-L Switch:SW_Push_Dual SW?
-U 1 1 682E89B2
-P 9590 2090
-AR Path="/67C77D26/682E89B2" Ref="SW?"  Part="1" 
-AR Path="/6823454A/682E89B2" Ref="SW?"  Part="1" 
-F 0 "SW?" V 9636 1802 50  0000 R CNN
-F 1 "SW_Push_Dual" V 9400 2690 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 9590 2290 50  0001 C CNN
-F 3 "~" H 9590 2290 50  0001 C CNN
-	1    9590 2090
-	0    1    -1   0   
-$EndComp
-$Comp
 L Device:R R?
 U 1 1 682E89B8
 P 9590 1580
 AR Path="/67C77D26/682E89B8" Ref="R?"  Part="1" 
-AR Path="/6823454A/682E89B8" Ref="R?"  Part="1" 
-F 0 "R?" H 9660 1626 50  0000 L CNN
+AR Path="/6823454A/682E89B8" Ref="R70"  Part="1" 
+F 0 "R70" H 9660 1626 50  0000 L CNN
 F 1 "4k7" H 9660 1535 50  0000 L CNN
-F 2 "" V 9520 1580 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 9520 1580 50  0001 C CNN
 F 3 "~" H 9590 1580 50  0001 C CNN
 	1    9590 1580
 	1    0    0    -1  
@@ -380,10 +313,10 @@ L Device:R R?
 U 1 1 682E89BE
 P 9140 2470
 AR Path="/67C77D26/682E89BE" Ref="R?"  Part="1" 
-AR Path="/6823454A/682E89BE" Ref="R?"  Part="1" 
-F 0 "R?" V 8933 2470 50  0000 C CNN
+AR Path="/6823454A/682E89BE" Ref="R69"  Part="1" 
+F 0 "R69" V 8933 2470 50  0000 C CNN
 F 1 "100" V 9024 2470 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 9070 2470 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 9070 2470 50  0001 C CNN
 F 3 "~" H 9140 2470 50  0001 C CNN
 	1    9140 2470
 	0    1    1    0   
@@ -393,10 +326,10 @@ L Device:C C?
 U 1 1 682E89C4
 P 8800 2100
 AR Path="/67C77D26/682E89C4" Ref="C?"  Part="1" 
-AR Path="/6823454A/682E89C4" Ref="C?"  Part="1" 
-F 0 "C?" H 8915 2146 50  0000 L CNN
+AR Path="/6823454A/682E89C4" Ref="C50"  Part="1" 
+F 0 "C50" H 8915 2146 50  0000 L CNN
 F 1 "100nF" H 8915 2055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric" H 8838 1950 50  0001 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 8838 1950 50  0001 C CNN
 F 3 "~" H 8800 2100 50  0001 C CNN
 	1    8800 2100
 	1    0    0    -1  
@@ -406,20 +339,14 @@ L Jumper:Jumper_2_Open JP?
 U 1 1 682E89CA
 P 10330 1800
 AR Path="/67C77D26/682E89CA" Ref="JP?"  Part="1" 
-AR Path="/6823454A/682E89CA" Ref="JP?"  Part="1" 
-F 0 "JP?" H 10330 2035 50  0000 C CNN
+AR Path="/6823454A/682E89CA" Ref="JP72"  Part="1" 
+F 0 "JP72" H 10330 2035 50  0000 C CNN
 F 1 "Jumper_2_Open" H 10330 1650 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 10330 1800 50  0001 C CNN
 F 3 "~" H 10330 1800 50  0001 C CNN
 	1    10330 1800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9590 1890 9590 1800
-Wire Wire Line
-	9390 1890 9390 1800
-Wire Wire Line
-	9390 1800 9590 1800
 Connection ~ 9590 1800
 Wire Wire Line
 	9590 1800 9590 1730
@@ -437,28 +364,15 @@ F 3 "" H 9590 2610 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9590 2290 9590 2470
-Wire Wire Line
-	9390 2290 9390 2470
-Wire Wire Line
-	9390 2470 9590 2470
-Connection ~ 9590 2470
-Wire Wire Line
 	9590 2470 9590 2610
 Wire Wire Line
 	8990 2470 8800 2470
 Wire Wire Line
 	8800 2470 8800 2250
 Wire Wire Line
-	9390 1800 8800 1800
-Wire Wire Line
 	8800 1800 8800 1950
-Connection ~ 9390 1800
 Wire Wire Line
 	9590 1800 10130 1800
-Wire Wire Line
-	9390 2470 9290 2470
-Connection ~ 9390 2470
 Text Notes 8790 1510 0    50   ~ 0
 OPTION BUTTON
 Text HLabel 2900 1800 2    50   Input ~ 0
@@ -478,10 +392,10 @@ Wire Wire Line
 Wire Wire Line
 	2900 1800 2820 1800
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR028
 U 1 1 68F26691
 P 1880 1050
-F 0 "#PWR?" H 1880 900 50  0001 C CNN
+F 0 "#PWR028" H 1880 900 50  0001 C CNN
 F 1 "VDD" H 1895 1223 50  0000 C CNN
 F 2 "" H 1880 1050 50  0001 C CNN
 F 3 "" H 1880 1050 50  0001 C CNN
@@ -489,10 +403,10 @@ F 3 "" H 1880 1050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR029
 U 1 1 68F27109
 P 4450 1045
-F 0 "#PWR?" H 4450 895 50  0001 C CNN
+F 0 "#PWR029" H 4450 895 50  0001 C CNN
 F 1 "VDD" H 4465 1218 50  0000 C CNN
 F 2 "" H 4450 1045 50  0001 C CNN
 F 3 "" H 4450 1045 50  0001 C CNN
@@ -500,10 +414,10 @@ F 3 "" H 4450 1045 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR030
 U 1 1 68F27C77
 P 6970 1030
-F 0 "#PWR?" H 6970 880 50  0001 C CNN
+F 0 "#PWR030" H 6970 880 50  0001 C CNN
 F 1 "VDD" H 6985 1203 50  0000 C CNN
 F 2 "" H 6970 1030 50  0001 C CNN
 F 3 "" H 6970 1030 50  0001 C CNN
@@ -511,10 +425,10 @@ F 3 "" H 6970 1030 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR031
 U 1 1 68F28670
 P 9590 1060
-F 0 "#PWR?" H 9590 910 50  0001 C CNN
+F 0 "#PWR031" H 9590 910 50  0001 C CNN
 F 1 "VDD" H 9605 1233 50  0000 C CNN
 F 2 "" H 9590 1060 50  0001 C CNN
 F 3 "" H 9590 1060 50  0001 C CNN
@@ -529,4 +443,62 @@ Wire Wire Line
 	4450 1045 4450 1430
 Wire Wire Line
 	1880 1050 1880 1430
+$Comp
+L Switch:SW_Push SW5
+U 1 1 690AFE63
+P 6770 2090
+F 0 "SW5" V 6724 2238 50  0000 L CNN
+F 1 "SW_Push" V 6815 2238 50  0000 L CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm" H 6770 2290 50  0001 C CNN
+F 3 "~" H 6770 2290 50  0001 C CNN
+	1    6770 2090
+	0    1    1    0   
+$EndComp
+$Comp
+L Switch:SW_Push SW6
+U 1 1 690B1986
+P 9390 2115
+F 0 "SW6" V 9290 2420 50  0000 R CNN
+F 1 "SW_Push" V 9370 2595 50  0000 R CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm" H 9390 2315 50  0001 C CNN
+F 3 "~" H 9390 2315 50  0001 C CNN
+	1    9390 2115
+	0    1    1    0   
+$EndComp
+$Comp
+L Switch:SW_Push SW4
+U 1 1 690B60FF
+P 4250 2090
+F 0 "SW4" V 4204 2238 50  0000 L CNN
+F 1 "SW_Push" V 4295 2238 50  0000 L CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm" H 4250 2290 50  0001 C CNN
+F 3 "~" H 4250 2290 50  0001 C CNN
+	1    4250 2090
+	0    1    1    0   
+$EndComp
+$Comp
+L Switch:SW_Push SW3
+U 1 1 690B70CD
+P 1680 2090
+F 0 "SW3" V 1634 2238 50  0000 L CNN
+F 1 "SW_Push" V 1725 2238 50  0000 L CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm" H 1680 2290 50  0001 C CNN
+F 3 "~" H 1680 2290 50  0001 C CNN
+	1    1680 2090
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9290 2470 9390 2470
+Wire Wire Line
+	8800 1800 9390 1800
+Wire Wire Line
+	9390 1915 9390 1800
+Connection ~ 9390 1800
+Wire Wire Line
+	9390 1800 9590 1800
+Wire Wire Line
+	9390 2315 9390 2470
+Connection ~ 9390 2470
+Wire Wire Line
+	9390 2470 9590 2470
 $EndSCHEMATC

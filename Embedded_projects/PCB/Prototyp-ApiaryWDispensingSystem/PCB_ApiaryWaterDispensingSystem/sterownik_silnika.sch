@@ -29,12 +29,12 @@ Wire Wire Line
 Wire Wire Line
 	3150 2600 3150 2550
 $Comp
-L library-ApiaryWater:drv8835 U?
+L library-ApiaryWater:drv8835 U7
 U 1 1 67E33780
 P 4550 2700
-F 0 "U?" H 4360 3170 50  0000 C CNN
+F 0 "U7" H 4360 3170 50  0000 C CNN
 F 1 "drv8835" H 4760 3180 50  0000 C CNN
-F 2 "" H 4550 2700 50  0001 C CNN
+F 2 "Package_SON:WSON-12-1EP_3x2mm_P0.5mm_EP1x2.65_ThermalVias" H 4550 2700 50  0001 C CNN
 F 3 "" H 4550 2700 50  0001 C CNN
 	1    4550 2700
 	1    0    0    -1  
@@ -66,8 +66,6 @@ Text GLabel 5280 2400 2    50   Input ~ 0
 BENABLE
 Text GLabel 5270 2500 2    50   Input ~ 0
 BPHASE
-Text GLabel 5270 2600 2    50   Input ~ 0
-AENBL
 Text GLabel 5270 2700 2    50   Input ~ 0
 APHASE
 Text GLabel 5270 2800 2    50   Input ~ 0
@@ -104,16 +102,6 @@ Wire Wire Line
 	1090 1100 890  1100
 Text Notes 3610 710  0    118  ~ 0
 DRIVER
-Text Label 2590 2450 0    50   ~ 0
-PUMP_POWER
-Text Label 2580 2550 0    50   ~ 0
-PUMP_POWER
-Text Label 2550 2950 0    50   ~ 0
-PUMP_POWER
-Text Label 2560 3050 0    50   ~ 0
-PUMP_POWER
-Text Label 4980 2400 0    50   ~ 0
-DIGITAL
 Wire Wire Line
 	4950 2400 5280 2400
 Wire Wire Line
@@ -124,19 +112,11 @@ Wire Wire Line
 	4950 2700 5270 2700
 Wire Wire Line
 	4950 2800 5270 2800
-Text Label 4980 2500 0    50   ~ 0
-DIGITAL
-Text Label 4980 2600 0    50   ~ 0
-DIGITAL
-Text Label 4980 2700 0    50   ~ 0
-DIGITAL
-Text Label 4980 2800 0    50   ~ 0
-DIGITAL
 $Comp
-L Device:Jumper_NO_Small JP?
+L Device:Jumper_NO_Small JP52
 U 1 1 67E30C26
 P 1680 2780
-F 0 "JP?" H 1680 2965 50  0000 C CNN
+F 0 "JP52" H 1680 2965 50  0000 C CNN
 F 1 "Jumper_NO_Small" H 1530 2870 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 1680 2780 50  0001 C CNN
 F 3 "~" H 1680 2780 50  0001 C CNN
@@ -144,10 +124,10 @@ F 3 "~" H 1680 2780 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:Jumper_NO_Small JP?
+L Device:Jumper_NO_Small JP66
 U 1 1 67E3150B
 P 2270 2790
-F 0 "JP?" H 2270 2975 50  0000 C CNN
+F 0 "JP66" H 2270 2975 50  0000 C CNN
 F 1 "Jumper_NO_Small" H 2270 2884 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 2270 2790 50  0001 C CNN
 F 3 "~" H 2270 2790 50  0001 C CNN
@@ -196,10 +176,10 @@ F 3 "" H 4820 1980 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C44
 U 1 1 67E3B4B9
 P 4820 1720
-F 0 "C?" H 4935 1766 50  0000 L CNN
+F 0 "C44" H 4935 1766 50  0000 L CNN
 F 1 "100n" H 4935 1675 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric" H 4858 1570 50  0001 C CNN
 F 3 "~" H 4820 1720 50  0001 C CNN
@@ -213,10 +193,10 @@ Wire Wire Line
 Text GLabel 8620 910  2    50   Input ~ 0
 VM
 $Comp
-L Device:D_Schottky D?
+L Device:D_Schottky D5
 U 1 1 67E41C38
 P 7400 1150
-F 0 "D?" V 7354 1230 50  0000 L CNN
+F 0 "D5" V 7354 1230 50  0000 L CNN
 F 1 "D_Schottky 6,8 V SMAZ6V8" V 7430 -270 50  0000 L CNN
 F 2 "Diode_SMD:D_SMA" H 7400 1150 50  0001 C CNN
 F 3 "~" H 7400 1150 50  0001 C CNN
@@ -224,10 +204,10 @@ F 3 "~" H 7400 1150 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R54
 U 1 1 67E428F8
 P 7400 1570
-F 0 "R?" H 7470 1616 50  0000 L CNN
+F 0 "R54" H 7470 1616 50  0000 L CNN
 F 1 "100k" H 7470 1525 50  0000 L CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 7330 1570 50  0001 C CNN
 F 3 "~" H 7400 1570 50  0001 C CNN
@@ -235,10 +215,10 @@ F 3 "~" H 7400 1570 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R55
 U 1 1 67E42C3E
 P 8100 1140
-F 0 "R?" H 8170 1186 50  0000 L CNN
+F 0 "R55" H 8170 1186 50  0000 L CNN
 F 1 "1" H 8170 1095 50  0000 L CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8030 1140 50  0001 C CNN
 F 3 "~" H 8100 1140 50  0001 C CNN
@@ -246,10 +226,10 @@ F 3 "~" H 8100 1140 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C45
 U 1 1 67E4304B
 P 8100 1540
-F 0 "C?" H 8215 1586 50  0000 L CNN
+F 0 "C45" H 8215 1586 50  0000 L CNN
 F 1 "10u" H 8215 1495 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0805_2012Metric" H 8138 1390 50  0001 C CNN
 F 3 "~" H 8100 1540 50  0001 C CNN
@@ -257,10 +237,10 @@ F 3 "~" H 8100 1540 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C46
 U 1 1 67E439CE
 P 8500 1150
-F 0 "C?" H 8615 1196 50  0000 L CNN
+F 0 "C46" H 8615 1196 50  0000 L CNN
 F 1 "100n" H 8615 1105 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric" H 8538 1000 50  0001 C CNN
 F 3 "~" H 8500 1150 50  0001 C CNN
@@ -292,10 +272,10 @@ Connection ~ 4550 3230
 Wire Wire Line
 	4550 3230 4550 3390
 $Comp
-L Device:Q_PMOS_GSD Q?
+L Device:Q_PMOS_GSD Q1
 U 1 1 67E3DE47
 P 7080 1010
-F 0 "Q?" V 7422 1010 50  0000 C CNN
+F 0 "Q1" V 7422 1010 50  0000 C CNN
 F 1 "Q_PMOS_GSD" V 7331 1010 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-23" H 7280 1110 50  0001 C CNN
 F 3 "~" H 7080 1010 50  0001 C CNN
@@ -331,10 +311,10 @@ VIN
 Wire Wire Line
 	6540 910  6880 910 
 $Comp
-L Connector_Generic:Conn_01x02 Wejscie_zasilania_pomp?
+L Connector_Generic:Conn_01x02 Wejscie_zasilania_pomp1
 U 1 1 67FB261B
 P 880 3690
-F 0 "Wejscie_zasilania_pomp?" H 640 3370 50  0000 C CNN
+F 0 "Wejscie_zasilania_pomp1" H 640 3370 50  0000 C CNN
 F 1 "Conn_01x02" H 798 3456 50  0000 C CNN
 F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 880 3690 50  0001 C CNN
 F 3 "~" H 880 3690 50  0001 C CNN
@@ -435,10 +415,10 @@ Connection ~ 4550 1500
 Wire Wire Line
 	4550 1500 4550 2200
 $Comp
-L Connector_Generic:Conn_02x01 J?
+L Connector_Generic:Conn_02x01 J16
 U 1 1 68EF4B8A
 P 1720 4335
-F 0 "J?" H 1760 4215 50  0000 C CNN
+F 0 "J16" H 1760 4215 50  0000 C CNN
 F 1 "Conn_02x01" H 1770 4461 50  0000 C CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 1720 4335 50  0001 C CNN
 F 3 "~" H 1720 4335 50  0001 C CNN
@@ -456,10 +436,10 @@ Wire Wire Line
 Text Notes 5260 785  0    50   ~ 0
 Tranzystor P-MOSFET FDN338P SOT23 
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR026
 U 1 1 68F93D47
 P 4550 1350
-F 0 "#PWR?" H 4550 1200 50  0001 C CNN
+F 0 "#PWR026" H 4550 1200 50  0001 C CNN
 F 1 "VDD" H 4565 1523 50  0000 C CNN
 F 2 "" H 4550 1350 50  0001 C CNN
 F 3 "" H 4550 1350 50  0001 C CNN
@@ -474,4 +454,6 @@ Text HLabel 870  1225 0    50   Input ~ 0
 VM
 Wire Wire Line
 	1090 1225 870  1225
+Text GLabel 5270 2600 2    50   Input ~ 0
+AENABLE
 $EndSCHEMATC

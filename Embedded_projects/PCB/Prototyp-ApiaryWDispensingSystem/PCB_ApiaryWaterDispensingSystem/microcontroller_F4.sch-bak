@@ -14,17 +14,6 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Switch:SW_Push_Dual SW1
-U 1 1 67E57DF4
-P 1510 5450
-F 0 "SW1" V 1556 5162 50  0000 R CNN
-F 1 "SW_Push_Dual" V 1185 5995 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 1510 5650 50  0001 C CNN
-F 3 "~" H 1510 5650 50  0001 C CNN
-	1    1510 5450
-	0    1    -1   0   
-$EndComp
-$Comp
 L Device:R R30
 U 1 1 67E58DD1
 P 1510 4940
@@ -68,19 +57,6 @@ F 3 "~" H 1970 5160 50  0001 C CNN
 	1    1970 5160
 	1    0    0    -1  
 $EndComp
-$Comp
-L MCU_ST_STM32F4:STM32F411RETx U?
-U 1 1 67E5B943
-P 5010 3760
-F 0 "U?" H 4430 1970 50  0000 C CNN
-F 1 "STM32F411RETx" H 5680 1970 50  0000 C CNN
-F 2 "Package_QFP:LQFP-64_10x10mm_P0.5mm" H 4410 2060 50  0001 R CNN
-F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00115249.pdf" H 5010 3760 50  0001 C CNN
-	1    5010 3760
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1510 5250 1510 5160
 Wire Wire Line
 	1310 5250 1310 5160
 Wire Wire Line
@@ -100,12 +76,9 @@ F 3 "" H 1510 5970 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1510 5650 1510 5830
-Wire Wire Line
 	1310 5650 1310 5830
 Wire Wire Line
 	1310 5830 1510 5830
-Connection ~ 1510 5830
 Wire Wire Line
 	1510 5830 1510 5970
 Wire Wire Line
@@ -150,7 +123,7 @@ F 1 "0" V 3460 6050 50  0000 L CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 3280 5960 50  0001 C CNN
 F 3 "~" H 3350 5960 50  0001 C CNN
 	1    3350 5960
-	0    1    1    0   
+	0    -1   -1   0   
 $EndComp
 Wire Wire Line
 	3510 5260 4310 5260
@@ -335,8 +308,6 @@ Wire Wire Line
 	3730 3360 3730 3260
 Wire Wire Line
 	3730 3260 3700 3260
-Wire Wire Line
-	3160 3260 2690 3260
 Wire Wire Line
 	2690 3260 2690 3280
 Wire Wire Line
@@ -645,10 +616,6 @@ Text GLabel 5930 1230 2    50   Input ~ 0
 PF7
 Wire Wire Line
 	5700 1230 5930 1230
-Text GLabel 4500 810  2    50   Input ~ 0
-W-L1-VDD
-Text GLabel 5010 1930 1    50   Input ~ 0
-W-L1-VDD
 Wire Wire Line
 	4500 810  4400 810 
 Wire Wire Line
@@ -673,10 +640,10 @@ Wire Wire Line
 Wire Wire Line
 	5310 1490 5320 1490
 $Comp
-L Device:L L?
+L Device:L L1
 U 1 1 67F1388C
 P 6000 1490
-F 0 "L?" V 5930 1600 50  0000 C CNN
+F 0 "L1" V 5930 1600 50  0000 C CNN
 F 1 "L" V 5920 1370 50  0000 C CNN
 F 2 "Inductor_SMD:L_0603_1608Metric" H 6000 1490 50  0001 C CNN
 F 3 "~" H 6000 1490 50  0001 C CNN
@@ -694,8 +661,6 @@ F 3 "" H 6410 1430 50  0001 C CNN
 	1    6410 1430
 	1    0    0    -1  
 $EndComp
-Text GLabel 6400 1630 2    50   Output ~ 0
-W-L1-VDD
 Wire Wire Line
 	6150 1490 6290 1490
 Wire Wire Line
@@ -782,8 +747,6 @@ Wire Wire Line
 	6510 2560 6900 2560
 Wire Wire Line
 	6510 2660 7200 2660
-Text GLabel 5840 1020 2    50   Input ~ 0
-W-L1-VDD
 Wire Wire Line
 	5840 1020 5700 1020
 Text GLabel 5830 2660 2    50   Input ~ 0
@@ -1285,7 +1248,7 @@ U 1 1 68018B6A
 P 1720 6860
 F 0 "B2" H 1766 6572 50  0000 R CNN
 F 1 "SW_Push_Dual" H 1940 7080 50  0000 R CNN
-F 2 "Button_Switch_SMD:SW_Push_1P1T_NO_6x6mm_H9.5mm" H 1720 7060 50  0001 C CNN
+F 2 "Button_Switch_SMD:SW_SPST_Omron_B3FS-100xP" H 1720 7060 50  0001 C CNN
 F 3 "~" H 1720 7060 50  0001 C CNN
 	1    1720 6860
 	-1   0    0    -1  
@@ -1693,7 +1656,7 @@ U 1 1 68331ADD
 P 8510 1700
 F 0 "J7" H 8560 2817 50  0000 C CNN
 F 1 "Conn_02x19_Odd_Even" H 8560 2726 50  0000 C CNN
-F 2 "" H 8510 1700 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x19_P2.54mm_Vertical" H 8510 1700 50  0001 C CNN
 F 3 "~" H 8510 1700 50  0001 C CNN
 	1    8510 1700
 	1    0    0    -1  
@@ -1713,7 +1676,7 @@ U 1 1 683ACEC4
 P 10240 1690
 F 0 "J10" H 10290 2807 50  0000 C CNN
 F 1 "Conn_02x19_Odd_Even" H 10290 2716 50  0000 C CNN
-F 2 "" H 10240 1690 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x19_P2.54mm_Vertical" H 10240 1690 50  0001 C CNN
 F 3 "~" H 10240 1690 50  0001 C CNN
 	1    10240 1690
 	1    0    0    -1  
@@ -1822,74 +1785,6 @@ Text GLabel 8120 1900 0    50   Input ~ 0
 PC13
 Wire Wire Line
 	8310 1900 8120 1900
-$Comp
-L Jumper:Jumper_2_Open JP49
-U 1 1 684DA5E9
-P 8000 2000
-F 0 "JP49" H 7750 2060 50  0000 C CNN
-F 1 "Jumper_2_Open" H 8090 1850 50  0001 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 8000 2000 50  0001 C CNN
-F 3 "~" H 8000 2000 50  0001 C CNN
-	1    8000 2000
-	-1   0    0    1   
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP48
-U 1 1 684DACBA
-P 8000 2100
-F 0 "JP48" H 7750 2160 50  0000 C CNN
-F 1 "Jumper_2_Open" H 8090 1950 50  0001 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 8000 2100 50  0001 C CNN
-F 3 "~" H 8000 2100 50  0001 C CNN
-	1    8000 2100
-	-1   0    0    1   
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP55
-U 1 1 684DAF0A
-P 8000 2200
-F 0 "JP55" H 7750 2260 50  0000 C CNN
-F 1 "Jumper_2_Open" H 8090 2050 50  0001 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 8000 2200 50  0001 C CNN
-F 3 "~" H 8000 2200 50  0001 C CNN
-	1    8000 2200
-	-1   0    0    1   
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP54
-U 1 1 684DB210
-P 8010 2300
-F 0 "JP54" H 7770 2360 50  0000 C CNN
-F 1 "Jumper_2_Open" H 8100 2150 50  0001 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 8010 2300 50  0001 C CNN
-F 3 "~" H 8010 2300 50  0001 C CNN
-	1    8010 2300
-	-1   0    0    1   
-$EndComp
-Text GLabel 7750 2000 0    50   Input ~ 0
-PC14
-Text GLabel 7720 2100 0    50   Input ~ 0
-PC15
-Text GLabel 7720 2200 0    50   Input ~ 0
-PF0
-Text GLabel 7720 2300 0    50   Input ~ 0
-PF1
-Wire Wire Line
-	7800 2000 7750 2000
-Wire Wire Line
-	7720 2100 7800 2100
-Wire Wire Line
-	7720 2200 7800 2200
-Wire Wire Line
-	8310 2000 8200 2000
-Wire Wire Line
-	8200 2100 8310 2100
-Wire Wire Line
-	8310 2200 8200 2200
-Wire Wire Line
-	8210 2300 8310 2300
-Wire Wire Line
-	7720 2300 7810 2300
 Text GLabel 7720 2500 0    50   Input ~ 0
 PC2
 Text GLabel 7720 2600 0    50   Input ~ 0
@@ -2473,8 +2368,6 @@ Text Notes 10120 2985 0    50   ~ 0
 JP20, JP24, JP29, \nOpen only for F302
 Wire Wire Line
 	7320 2400 8310 2400
-Text GLabel 5200 1940 1    50   Input ~ 0
-W-L1-VDD
 Wire Wire Line
 	3750 1550 3635 1550
 Connection ~ 3635 1550
@@ -2492,51 +2385,21 @@ Wire Wire Line
 	10240 5845 10605 5845
 Wire Wire Line
 	10605 5975 10240 5975
-Text GLabel 8945 6355 0    50   Input ~ 0
-PA11
-Text HLabel 9330 6355 2    50   Input ~ 0
+Text HLabel 7140 4635 2    50   Input ~ 0
 SQW
-Wire Wire Line
-	9330 6355 8945 6355
-Text GLabel 8945 6470 0    50   Input ~ 0
+Text GLabel 6755 4750 0    50   Input ~ 0
 PA0
-Text HLabel 9335 6470 2    50   Input ~ 0
+Text HLabel 7145 4750 2    50   Input ~ 0
 ADC1_IN0
 Wire Wire Line
-	9335 6470 8945 6470
-Text GLabel 8960 5690 0    50   Output ~ 0
-PB13
-Text GLabel 8960 5830 0    50   Input ~ 0
-PB15
-Text GLabel 8960 5970 0    50   Input ~ 0
-PC2
-Text HLabel 9285 5690 2    50   Output ~ 0
-SPI2_SCK
-Wire Wire Line
-	9285 5690 8960 5690
-Text HLabel 9285 5830 2    50   Input ~ 0
-SPI2_MOSI
-Wire Wire Line
-	9285 5830 8960 5830
-Text HLabel 9290 5970 2    50   Input ~ 0
-SPI2_MISO
-Wire Wire Line
-	9290 5970 8960 5970
-Text HLabel 9300 6110 2    50   Input ~ 0
-SPI2_CS
-Text GLabel 8960 6115 0    50   Input ~ 0
-PB10
+	7145 4750 6755 4750
 Wire Wire Line
 	8960 6115 9300 6115
-Wire Wire Line
-	9300 6115 9300 6110
-Text Notes 8775 6275 0    50   ~ 0
-ADC Connections
 $Comp
-L Jumper:Jumper_2_Open JP?
+L Jumper:Jumper_2_Open JP1
 U 1 1 68F03CE2
 P 3290 1380
-F 0 "JP?" H 3290 1615 50  0000 C CNN
+F 0 "JP1" H 3290 1615 50  0000 C CNN
 F 1 "Jumper_2_Open" H 3280 1515 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 3290 1380 50  0001 C CNN
 F 3 "~" H 3290 1380 50  0001 C CNN
@@ -2573,4 +2436,167 @@ Wire Wire Line
 	8130 4590 8425 4590
 Text Notes 7955 4325 0    50   ~ 10
 POWER SUPPLY
+Text HLabel 9315 6450 2    50   Output ~ 0
+DC_DISPLAY
+Text HLabel 9315 6335 2    50   Output ~ 0
+RST_DISPLAY
+Text HLabel 9310 6230 2    50   Output ~ 0
+BACKLIGHT
+Text Notes 6585 4555 0    50   ~ 0
+ADC Connections
+Wire Wire Line
+	7140 4635 6755 4635
+Text GLabel 6755 4635 0    50   Input ~ 0
+PA11
+Wire Wire Line
+	9300 6115 9300 6110
+Text GLabel 8960 6115 0    50   Input ~ 0
+PB10
+Text HLabel 9300 6110 2    50   Input ~ 0
+SPI2_CS
+Wire Wire Line
+	9290 5970 8960 5970
+Text HLabel 9290 5970 2    50   Input ~ 0
+SPI2_MISO
+Wire Wire Line
+	9285 5830 8960 5830
+Text HLabel 9285 5830 2    50   Input ~ 0
+SPI2_MOSI
+Wire Wire Line
+	9285 5690 8960 5690
+Text HLabel 9285 5690 2    50   Output ~ 0
+SPI2_SCK
+Text GLabel 8960 5970 0    50   Input ~ 0
+PC2
+Text GLabel 8960 5830 0    50   Input ~ 0
+PB15
+Text GLabel 8960 5690 0    50   Output ~ 0
+PB13
+Text GLabel 8930 6230 0    50   Output ~ 0
+PA10
+Text GLabel 8930 6335 0    50   Output ~ 0
+PA9
+Text GLabel 8930 6450 0    50   Output ~ 0
+PA8
+Wire Wire Line
+	9310 6230 8930 6230
+Wire Wire Line
+	9315 6335 8930 6335
+Wire Wire Line
+	8930 6450 9315 6450
+$Comp
+L Switch:SW_Push_Dual B1
+U 1 1 690C2C64
+P 1510 5450
+F 0 "B1" H 1556 5162 50  0000 R CNN
+F 1 "SW_Push_Dual" V 1235 6045 50  0000 R CNN
+F 2 "Button_Switch_SMD:SW_SPST_Omron_B3FS-100xP" H 1510 5650 50  0001 C CNN
+F 3 "~" H 1510 5650 50  0001 C CNN
+	1    1510 5450
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	1510 5250 1510 5160
+Wire Wire Line
+	1510 5160 1510 5155
+Wire Wire Line
+	1510 5650 1510 5830
+Connection ~ 1510 5830
+Text GLabel 8835 2985 2    50   Input ~ 0
+D13
+$Comp
+L Device:R R72
+U 1 1 68FB6AB0
+P 8075 2985
+F 0 "R72" V 7868 2985 50  0000 C CNN
+F 1 "510" V 7959 2985 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 8005 2985 50  0001 C CNN
+F 3 "~" H 8075 2985 50  0001 C CNN
+	1    8075 2985
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR038
+U 1 1 68FE9C57
+P 7295 2985
+F 0 "#PWR038" H 7295 2735 50  0001 C CNN
+F 1 "GND" H 7300 2812 50  0000 C CNN
+F 2 "" H 7295 2985 50  0001 C CNN
+F 3 "" H 7295 2985 50  0001 C CNN
+	1    7295 2985
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7295 2985 7515 2985
+Wire Wire Line
+	7815 2985 7925 2985
+Wire Wire Line
+	8375 2985 8225 2985
+$Comp
+L Jumper:Jumper_2_Open JP21
+U 1 1 69080A2B
+P 8575 2985
+F 0 "JP21" H 8335 3045 50  0000 C CNN
+F 1 "Jumper_2_Open" H 8665 2835 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 8575 2985 50  0001 C CNN
+F 3 "~" H 8575 2985 50  0001 C CNN
+	1    8575 2985
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8835 2985 8775 2985
+$Comp
+L Device:LED D8
+U 1 1 68FB841B
+P 7665 2985
+F 0 "D8" H 7658 3202 50  0000 C CNN
+F 1 "LED" H 7658 3111 50  0000 C CNN
+F 2 "LED_SMD:LED_0805_2012Metric" H 7665 2985 50  0001 C CNN
+F 3 "~" H 7665 2985 50  0001 C CNN
+	1    7665 2985
+	1    0    0    -1  
+$EndComp
+Text Label 5210 1985 1    50   ~ 0
+W-L1-VDD
+Text Label 5010 2000 1    50   ~ 0
+W-L1-VDD
+Text Label 6335 1630 0    50   ~ 0
+W-L1-VDD
+Text Label 4425 810  0    50   ~ 0
+W-L1-VDD
+Text Label 5805 1020 0    50   ~ 0
+W-L1-VDD
+Wire Wire Line
+	3160 3260 2690 3260
+Text Label 2995 5960 0    50   ~ 0
+OSC-
+Text Label 3025 5260 0    50   ~ 0
+OSC+
+Text Label 2810 3260 0    50   ~ 0
+HIGHOSC+
+Text Label 2815 3660 0    50   ~ 0
+HIGHOSC-
+Text Label 3675 5260 0    50   ~ 0
+IN_OSC+
+Text Label 3820 5360 0    50   ~ 0
+IN_OSC-
+Text Label 3815 3360 0    50   ~ 0
+IN_HIGHOSC+
+Text Label 3790 3460 0    50   ~ 0
+IN_HIGHOSC-
+NoConn ~ 8310 2000
+NoConn ~ 8310 2100
+NoConn ~ 8310 2200
+NoConn ~ 8310 2300
+$Comp
+L MCU_ST_STM32F4:STM32F411RETx U1
+U 1 1 67E5B943
+P 5010 3760
+F 0 "U1" H 4430 1970 50  0000 C CNN
+F 1 "STM32F411RETx" H 5680 1970 50  0000 C CNN
+F 2 "Package_QFP:LQFP-64_10x10mm_P0.5mm" H 4410 2060 50  0001 R CNN
+F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00115249.pdf" H 5010 3760 50  0001 C CNN
+	1    5010 3760
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

@@ -14,17 +14,6 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L ApiaryWaterDispensingSystem:LD39050PU33R U??
-U 1 1 67F96C5D
-P 5990 2800
-F 0 "U??" H 5990 3165 50  0000 C CNN
-F 1 "LD39050PU33R" H 5990 3074 50  0000 C CNN
-F 2 "" H 5990 2800 50  0001 C CNN
-F 3 "" H 5990 2800 50  0001 C CNN
-	1    5990 2800
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:CP C16
 U 1 1 67F97715
 P 1410 2290
@@ -82,10 +71,10 @@ F 3 "~" H 2920 2330 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:D_Small D?
+L Device:D_Small D6
 U 1 1 67F9ACDF
 P 3100 2050
-F 0 "D?" H 3100 1843 50  0000 C CNN
+F 0 "D6" H 3100 1843 50  0000 C CNN
 F 1 "D_Small" H 3100 1934 50  0000 C CNN
 F 2 "Diode_SMD:D_SMA" V 3100 2050 50  0001 C CNN
 F 3 "~" V 3100 2050 50  0001 C CNN
@@ -154,21 +143,21 @@ Wire Wire Line
 	4770 2700 4980 2700
 Connection ~ 4770 2700
 $Comp
-L Jumper:Jumper_2_Open JP?
+L Jumper:Jumper_2_Open JP67
 U 1 1 67FA53C3
 P 2720 3440
-F 0 "JP?" H 2720 3675 50  0000 C CNN
+F 0 "JP67" H 2720 3675 50  0000 C CNN
 F 1 "Jumper_2_Open" H 2720 3584 50  0000 C CNN
-F 2 "" H 2720 3440 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 2720 3440 50  0001 C CNN
 F 3 "~" H 2720 3440 50  0001 C CNN
 	1    2720 3440
 	1    0    0    -1  
 $EndComp
 $Comp
-L ApiaryWaterDispensingSystem:STS7PF30L U?
+L ApiaryWaterDispensingSystem:STS7PF30L U9
 U 1 1 67FAB112
 P 2730 3920
-F 0 "U?" H 3104 3886 50  0000 L CNN
+F 0 "U9" H 3104 3886 50  0000 L CNN
 F 1 "STS7PF30L" H 3104 3795 50  0000 L CNN
 F 2 "Package_SO:SO-8_3.9x4.9mm_P1.27mm" H 2730 3920 50  0001 C CNN
 F 3 "" H 2730 3920 50  0001 C CNN
@@ -236,16 +225,16 @@ U 1 1 67FB298A
 P 4540 2920
 F 0 "R32" H 4610 2966 50  0000 L CNN
 F 1 "4k7" H 4610 2875 50  0000 L CNN
-F 2 "" V 4470 2920 50  0001 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 4470 2920 50  0001 C CNN
 F 3 "~" H 4540 2920 50  0001 C CNN
 	1    4540 2920
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:LED D?
+L Device:LED D7
 U 1 1 67FB2F5D
 P 4540 3290
-F 0 "D?" V 4579 3172 50  0000 R CNN
+F 0 "D7" V 4579 3172 50  0000 R CNN
 F 1 "LED" V 4488 3172 50  0000 R CNN
 F 2 "Diode_SMD:D_0603_1608Metric" H 4540 3290 50  0001 C CNN
 F 3 "~" H 4540 3290 50  0001 C CNN
@@ -303,13 +292,6 @@ Wire Wire Line
 	4980 3170 4980 3260
 Wire Wire Line
 	5400 3410 5400 3320
-Wire Wire Line
-	5590 2900 5400 2900
-Wire Wire Line
-	5400 2900 5400 3020
-Wire Wire Line
-	5400 2900 5400 2700
-Connection ~ 5400 2900
 Connection ~ 5400 2700
 Wire Wire Line
 	5400 2700 5590 2700
@@ -325,14 +307,7 @@ F 3 "" H 5890 3420 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6090 3200 6090 3350
-Wire Wire Line
-	6090 3350 5890 3350
-Wire Wire Line
-	5890 3350 5890 3200
-Wire Wire Line
 	5890 3350 5890 3420
-Connection ~ 5890 3350
 Wire Wire Line
 	2600 3820 2530 3820
 Wire Wire Line
@@ -383,8 +358,6 @@ PWR_ENn
 Wire Wire Line
 	1990 4340 1480 4340
 Connection ~ 1990 4340
-NoConn ~ 6390 2700
-NoConn ~ 6390 2900
 $Comp
 L power:GND #PWR0218
 U 1 1 67F9802C
@@ -406,15 +379,9 @@ Wire Wire Line
 	6800 3340 6800 3380
 Connection ~ 6800 3340
 Wire Wire Line
-	6390 2800 6800 2800
-Wire Wire Line
-	6800 2800 7200 2800
-Wire Wire Line
 	7200 2800 7200 3000
-Connection ~ 6800 2800
 Wire Wire Line
 	7400 2800 7200 2800
-Connection ~ 7200 2800
 Wire Wire Line
 	7800 2800 7870 2800
 $Comp
@@ -456,10 +423,10 @@ $EndComp
 Wire Wire Line
 	1800 3620 1800 3820
 $Comp
-L Regulator_Linear:LD1117S50TR_SOT223 U?
+L Regulator_Linear:LD1117S50TR_SOT223 U8
 U 1 1 68332228
 P 2230 2050
-F 0 "U?" H 2230 2292 50  0000 C CNN
+F 0 "U8" H 2230 2292 50  0000 C CNN
 F 1 "LD1117S50TR_SOT223" H 2230 2201 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-223-3_TabPin2" H 2230 2250 50  0001 C CNN
 F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf" H 2330 1800 50  0001 C CNN
@@ -472,19 +439,6 @@ Wire Wire Line
 	1410 2050 1930 2050
 Wire Wire Line
 	2230 2350 2230 2650
-$Comp
-L power:+VDC #PWR0240
-U 1 1 689704B4
-P 1000 1780
-F 0 "#PWR0240" H 1000 1680 50  0001 C CNN
-F 1 "+VDC" H 1000 2055 50  0000 C CNN
-F 2 "" H 1000 1780 50  0001 C CNN
-F 3 "" H 1000 1780 50  0001 C CNN
-	1    1000 1780
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1000 1780 1000 2050
 Wire Wire Line
 	2920 2050 2920 2180
 Wire Wire Line
@@ -498,10 +452,10 @@ Wire Wire Line
 Text Notes 925  2375 0    50   ~ 0
 good
 $Comp
-L Jumper:Jumper_2_Open JP?
+L Jumper:Jumper_2_Open JP68
 U 1 1 67F9CBCE
 P 7600 2800
-F 0 "JP?" H 7470 2920 50  0000 C CNN
+F 0 "JP68" H 7470 2920 50  0000 C CNN
 F 1 "Jumper_2_Open" H 7560 2630 50  0000 C CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm" H 7600 2800 50  0001 C CNN
 F 3 "~" H 7600 2800 50  0001 C CNN
@@ -524,12 +478,12 @@ Wire Wire Line
 Wire Wire Line
 	8955 2800 8820 2800
 $Comp
-L Connector_Generic:Conn_01x02 J?
+L Connector_Generic:Conn_01x02 J18
 U 1 1 68ED6183
 P 640 2150
-F 0 "J?" H 558 1825 50  0000 C CNN
+F 0 "J18" H 558 1825 50  0000 C CNN
 F 1 "Conn_01x02" H 558 1916 50  0000 C CNN
-F 2 "" H 640 2150 50  0001 C CNN
+F 2 "TerminalBlock_4Ucon:TerminalBlock_4Ucon_1x02_P3.50mm_Vertical" H 640 2150 50  0001 C CNN
 F 3 "~" H 640 2150 50  0001 C CNN
 	1    640  2150
 	-1   0    0    1   
@@ -538,10 +492,10 @@ Wire Wire Line
 	1000 2050 840  2050
 Connection ~ 1000 2050
 $Comp
-L power:GND #PWR?
+L power:GND #PWR027
 U 1 1 68ED818B
 P 895 2150
-F 0 "#PWR?" H 895 1900 50  0001 C CNN
+F 0 "#PWR027" H 895 1900 50  0001 C CNN
 F 1 "GND" H 900 1977 50  0000 C CNN
 F 2 "" H 895 2150 50  0001 C CNN
 F 3 "" H 895 2150 50  0001 C CNN
@@ -550,4 +504,57 @@ F 3 "" H 895 2150 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	895  2150 840  2150
+Text GLabel 1285 1050 2    50   Output ~ 0
+VM
+Text HLabel 1115 1050 0    50   Output ~ 0
+VM
+Wire Wire Line
+	1285 1050 1115 1050
+Text GLabel 915  1755 0    50   Output ~ 0
+VM
+Wire Wire Line
+	915  1755 1000 1755
+Wire Wire Line
+	1000 1755 1000 2050
+$Comp
+L ApiaryWaterDispensingSystem:LD39050PU33 U12
+U 1 1 69136F8C
+P 5910 2700
+F 0 "U12" H 5930 3065 50  0000 C CNN
+F 1 "LD39050PU33" H 5930 2974 50  0000 C CNN
+F 2 "Package_SON:WSON-6-1EP_3x3mm_P0.95mm" H 5910 2700 50  0001 C CNN
+F 3 "" H 5910 2700 50  0001 C CNN
+	1    5910 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6270 2700 6800 2700
+Wire Wire Line
+	6800 2700 6800 2800
+Wire Wire Line
+	6800 2700 7200 2700
+Wire Wire Line
+	7200 2700 7200 2800
+Connection ~ 6800 2700
+Connection ~ 7200 2800
+NoConn ~ 6270 2600
+NoConn ~ 6270 2800
+Wire Wire Line
+	5400 2700 5400 2800
+Wire Wire Line
+	5590 2800 5400 2800
+Connection ~ 5400 2800
+Wire Wire Line
+	5400 2800 5400 3020
+Wire Wire Line
+	5910 3100 5910 3205
+Wire Wire Line
+	5910 3350 5890 3350
+Wire Wire Line
+	5990 3100 5990 3205
+Wire Wire Line
+	5990 3205 5910 3205
+Connection ~ 5910 3205
+Wire Wire Line
+	5910 3205 5910 3350
 $EndSCHEMATC
