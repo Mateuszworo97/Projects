@@ -46,8 +46,8 @@ Development
 Visualization
 ------------
 image::    Embedded_projects/docs/images/3D_visualization.png
-    width: 600px
-    align: center
+    :alt: Visualization
+    :align: center
 
 Components
 ------------
