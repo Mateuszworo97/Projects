@@ -43,6 +43,11 @@ Development
 4. Desiging a much smaller PCB
 5. Creating own MPPT board
 
+Visualization
+------------
+image::    Embedded_projects\docs\images\water_dispensing_system\water_dispensing_system_diagram.png
+    width: 600px
+    align: center
 
 Components
 ------------
