@@ -45,7 +45,7 @@ Development
 
 Visualization
 ------------
-image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/3D_visualization.PNG
+.. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/3D_visualization.PNG
     :alt: Visualization
     :align: center
 
