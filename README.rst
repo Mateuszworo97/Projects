@@ -45,7 +45,7 @@ Development
 
 Visualization
 ------------
-image::    Embedded_projects\docs\images\water_dispensing_system_diagram.png
+image::    Embedded_projects/docs/images/3D_visualization.png
     width: 600px
     align: center
 
