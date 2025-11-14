@@ -417,17 +417,6 @@ F 3 "~" H 1145 1250 50  0001 C CNN
 	1    1145 1250
 	-1   0    0    1   
 $EndComp
-$Comp
-L power:GNDA #PWR0108
-U 1 1 67EB896C
-P 1145 1580
-F 0 "#PWR0108" H 1145 1330 50  0001 C CNN
-F 1 "GNDA" H 1150 1407 50  0000 C CNN
-F 2 "" H 1145 1580 50  0001 C CNN
-F 3 "" H 1145 1580 50  0001 C CNN
-	1    1145 1580
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	1145 980  1145 1100
 Wire Wire Line
@@ -441,17 +430,6 @@ F 1 "GND" H 620 1757 50  0000 C CNN
 F 2 "" H 615 1930 50  0001 C CNN
 F 3 "" H 615 1930 50  0001 C CNN
 	1    615  1930
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GNDA #PWR0110
-U 1 1 67EBF91F
-P 1365 1960
-F 0 "#PWR0110" H 1365 1710 50  0001 C CNN
-F 1 "GNDA" H 1370 1787 50  0000 C CNN
-F 2 "" H 1365 1960 50  0001 C CNN
-F 3 "" H 1365 1960 50  0001 C CNN
-	1    1365 1960
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -1204,17 +1182,6 @@ Wire Wire Line
 	5900 6570 5720 6570
 Text Notes 6040 5940 2    50   ~ 0
 Ceramic low ESR
-$Comp
-L power:GNDA #PWR0121
-U 1 1 6814EFF6
-P 5210 5730
-F 0 "#PWR0121" H 5210 5480 50  0001 C CNN
-F 1 "GNDA" H 5215 5557 50  0000 C CNN
-F 2 "" H 5210 5730 50  0001 C CNN
-F 3 "" H 5210 5730 50  0001 C CNN
-	1    5210 5730
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	5210 5560 5210 5730
 Wire Wire Line
@@ -1234,8 +1201,6 @@ Wire Wire Line
 	795  1850 615  1850
 Wire Wire Line
 	1195 1850 1365 1850
-Wire Wire Line
-	1365 1850 1365 1960
 NoConn ~ 3000 5610
 NoConn ~ 2800 5610
 Text GLabel 4170 2260 0    50   BiDi ~ 0
@@ -1527,8 +1492,6 @@ Text GLabel 8965 5295 0    50   Output ~ 0
 PC11
 Text GLabel 8955 5425 0    50   Output ~ 0
 PC10
-Text GLabel 8955 5555 0    50   Output ~ 0
-PB10
 Text Notes 10235 5335 0    50   ~ 0
 Motor Control
 Text HLabel 9295 5175 2    50   Output ~ 0
@@ -2079,19 +2042,6 @@ Wire Wire Line
 	10540 890  10620 890 
 Wire Wire Line
 	10620 790  10540 790 
-$Comp
-L power:GNDA #PWR0228
-U 1 1 68EF1599
-P 10800 2290
-F 0 "#PWR0228" H 10800 2040 50  0001 C CNN
-F 1 "GNDA" V 10805 2162 50  0000 R CNN
-F 2 "" H 10800 2290 50  0001 C CNN
-F 3 "" H 10800 2290 50  0001 C CNN
-	1    10800 2290
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	10800 2290 10540 2290
 Text GLabel 10620 2390 2    50   Input ~ 0
 PC4
 Text GLabel 10620 2490 2    50   Input ~ 0
@@ -2597,6 +2547,56 @@ F 1 "STM32F411RETx" H 5680 1970 50  0000 C CNN
 F 2 "Package_QFP:LQFP-64_10x10mm_P0.5mm" H 4410 2060 50  0001 R CNN
 F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00115249.pdf" H 5010 3760 50  0001 C CNN
 	1    5010 3760
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND1 #PWR0108
+U 1 1 690DACEC
+P 1365 1990
+F 0 "#PWR0108" H 1365 1740 50  0001 C CNN
+F 1 "GND1" H 1370 1817 50  0000 C CNN
+F 2 "" H 1365 1990 50  0001 C CNN
+F 3 "" H 1365 1990 50  0001 C CNN
+	1    1365 1990
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1365 1850 1365 1990
+$Comp
+L power:GND1 #PWR0110
+U 1 1 6910BCB4
+P 10935 2290
+F 0 "#PWR0110" H 10935 2040 50  0001 C CNN
+F 1 "GND1" H 10940 2117 50  0000 C CNN
+F 2 "" H 10935 2290 50  0001 C CNN
+F 3 "" H 10935 2290 50  0001 C CNN
+	1    10935 2290
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND1 #PWR0127
+U 1 1 6910BF54
+P 1145 1580
+F 0 "#PWR0127" H 1145 1330 50  0001 C CNN
+F 1 "GND1" H 1150 1407 50  0000 C CNN
+F 2 "" H 1145 1580 50  0001 C CNN
+F 3 "" H 1145 1580 50  0001 C CNN
+	1    1145 1580
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10540 2290 10935 2290
+Text GLabel 8955 5555 0    50   Output ~ 0
+PD2
+$Comp
+L power:GND1 #PWR?
+U 1 1 69218867
+P 5210 5730
+F 0 "#PWR?" H 5210 5480 50  0001 C CNN
+F 1 "GND1" H 5215 5557 50  0000 C CNN
+F 2 "" H 5210 5730 50  0001 C CNN
+F 3 "" H 5210 5730 50  0001 C CNN
+	1    5210 5730
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

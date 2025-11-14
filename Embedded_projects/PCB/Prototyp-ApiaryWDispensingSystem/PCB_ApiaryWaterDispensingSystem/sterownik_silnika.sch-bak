@@ -66,8 +66,6 @@ Text GLabel 5280 2400 2    50   Input ~ 0
 BENABLE
 Text GLabel 5270 2500 2    50   Input ~ 0
 BPHASE
-Text GLabel 5270 2600 2    50   Input ~ 0
-AENBL
 Text GLabel 5270 2700 2    50   Input ~ 0
 APHASE
 Text GLabel 5270 2800 2    50   Input ~ 0
@@ -456,4 +454,6 @@ Text HLabel 870  1225 0    50   Input ~ 0
 VM
 Wire Wire Line
 	1090 1225 870  1225
+Text GLabel 5270 2600 2    50   Input ~ 0
+AENABLE
 $EndSCHEMATC

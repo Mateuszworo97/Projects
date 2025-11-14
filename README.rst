@@ -48,7 +48,7 @@ By default, the pump is turned on for 1 minute. Every hour.
 Using push buttons, we can increase the pump activation time from 1 to 59 minutes.
 Using the buttons, we can also change the time at which the alarm will turn on (pump on).
 The next time the alarm will turn on will be increased by the hour value displayed on the display.
-we can delay the pump activation value from 1 to 16.
+we can delay the pump activation value from 1 to 16 hours.
 
 
 
@@ -63,12 +63,19 @@ Development
 4. Desiging a much smaller PCB
 5. Creating own MPPT board
 
+Block Diagram
+------------
+.. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/blockDiagram.PNG
+    :alt: Visualization
+    :align: center
+
 Visualization
 ------------
 .. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/3D_visualization.PNG
     :alt: Visualization
     :align: center
 
+..image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/routedPCBtracks.PNG
 Components
 ------------
 
