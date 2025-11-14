@@ -65,8 +65,8 @@ Development
 
 Block Diagram
 ------------
-.. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/blockDiagram.PNG
-    :alt: Visualization
+.. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/blockDiagram.png
+    :alt: Block Diagram
     :align: center
 
 Visualization
@@ -75,7 +75,10 @@ Visualization
     :alt: Visualization
     :align: center
 
-..image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/routedPCBtracks.PNG
+.. image::  https://github.com/Mateuszworo97/Projects/blob/experiment/Embedded_projects/docs/images/routedPCBtracks.PNG
+    :alt: Routed PCB tracks
+    :align: center
+
 Components
 ------------
 
